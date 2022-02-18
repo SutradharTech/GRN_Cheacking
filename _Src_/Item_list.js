@@ -40,7 +40,8 @@ const Item_list = ({ route, navigation }) => {
 
     }, [])
 
-    console.log('list======>', list);
+    console.log('list=====>', list);
+
 
     console.log("$$$$$$$$$$$LIST", list);
     let Qtyacpt = list[selectedIndex]?.qtyaccepted;
