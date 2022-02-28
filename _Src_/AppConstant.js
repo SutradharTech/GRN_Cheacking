@@ -11,7 +11,7 @@ const environments = {
 
 }
 
-const AppConstants = {
+const  AppConstants = {
 
     APIurl: environments.TEST.url,
     APIurl1: environments.TEST.url1

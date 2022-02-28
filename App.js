@@ -5,8 +5,8 @@ import Login from './_Src_/login/Login'
 const App = () => {
   return (
     <>
+    {/* <Login/> */}
     <Auth/>
-    
     </>
 
 

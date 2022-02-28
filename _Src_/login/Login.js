@@ -5,7 +5,7 @@ import { Card } from 'react-native-shadow-cards';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios'
-// import { GRN } from '../Nav';
+import { GRN } from '../auth/Auth';
 // import { useAuth } from '../frameWork/Auth/Auth';
 // import AppFunctions from '../AppFunctions';
 // import AppConstants from '../AppConstants';
@@ -13,7 +13,7 @@ import axios from 'axios'
 // Code Start From Here --->
 const Login = ({ navigation }) => {
 
-    const { isLogin, setisLogin } = useContext(GRN)
+    // const { isLogin, setisLogin } = useContext(GRN)
 
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
