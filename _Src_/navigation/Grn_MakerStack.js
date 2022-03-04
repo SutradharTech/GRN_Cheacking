@@ -10,7 +10,7 @@ const Grn_MakerStack = () => {
     <Stack.Navigator>
 
         <Stack.Screen name="Maker" component={Maker} options={{ headerShown: false, }} />
-        <Stack.Screen name="ShowItem" component={ShowItem} options={{ headerShown: true, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
+        <Stack.Screen name="ShowItem" component={ShowItem} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
 
       </Stack.Navigator>
   )

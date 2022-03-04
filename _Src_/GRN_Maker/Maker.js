@@ -1,10 +1,9 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
-
+import { StyleSheet, Text, View, FlatList, TouchableOpacity,RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { Button, Divider } from 'react-native-paper';
 
 const Maker = ({ navigation }) => {
 
@@ -12,20 +11,25 @@ const Maker = ({ navigation }) => {
         ApiCall()
     }, [])
 
-    const [filterBillDetais, setfilterBillDetais] = useState([])
+    const [filterBillDetails, setfilterBillDetails] = useState([])
+    const [refreshing, setRefreshing] = React.useState(false);
 
+    // Api Call
 
-    // Book Details Store ->
     async function ApiCall() {
-        const FilterBillData = await axios.post('https://dev.sutradhar.tech/bcore/api/v1/filtersalebill/',
-            {
-                "fromdate": 20220201,
-                "todate": 20220228,
-                "domainrecno": 508
-            }
-        );
-        // console.log("FilterBillData", FilterBillData.data.SaleBill)
-        setfilterBillDetais(FilterBillData.data.SaleBill);
+
+        setRefreshing(true);
+
+        var sendapidata = {
+            "domainrecno": 508,
+            "status": "P"
+        }
+
+        const FilterBillData = await axios.post('https://dev.sutradhar.tech/bcore/api/v1/filtersalebill/', sendapidata);
+        console.log("ApiRes // filtersalebill", FilterBillData.data.SaleBill)
+        setfilterBillDetails(FilterBillData.data.SaleBill);
+
+        setRefreshing(false);
     }
 
     // Formating Function For Date by DDMMYYYY
@@ -51,24 +55,21 @@ const Maker = ({ navigation }) => {
     }
 
     function renderItems({ item, index }) {
+        console.log("item----------------", item)
         return (
             <>
                 <View style={{ flex: 1, margin: "1%", marginVertical: '3%' }}>
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ShowItem', { item: item.items })} style={{ flex: 1, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ShowItem', { item: item, ApiCall: ApiCall })} style={{ flex: 1, }}>
 
-                            {/* <View style={{ flex: 1, flexDirection: 'row' }}> */}
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                            </View>
 
-                            {/* <View style={{ flex: 1 }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Date: {showDate_ddmmyy(item.trdate)} </Text>
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Bill No. : {item.billno} </Text>
-                                    </View>
-                                </View> */}
+                            <Divider />
 
                             <View style={styles.rows1}>
 
@@ -113,11 +114,12 @@ const Maker = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={filterBillDetais}
+                data={filterBillDetails}
                 renderItem={renderItems}
                 showsVerticalScrollIndicator={true}
                 // onEndReached={onEndReachedHandler}
                 keyExtractor={(item) => item.recno.toString()}
+                refreshControl={ <RefreshControl refreshing={refreshing} onRefresh={ApiCall} />}
             />
         </View>
     )
