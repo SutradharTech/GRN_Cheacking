@@ -1,11 +1,11 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Packer from '../Grn_Packer/Packer';
-import ListItem from '../Grn_Packer/ListItem';
+import Packer from '../Packer/Packer';
+import ListItem from '../Packer/ListItem';
 
 const Stack = createNativeStackNavigator();
 
-const Grn_CheckerStack = () => {
+const PackerStack = () => {
   return (
     <Stack.Navigator>
 
@@ -16,4 +16,4 @@ const Grn_CheckerStack = () => {
   )
 }
 
-export default Grn_CheckerStack
+export default PackerStack

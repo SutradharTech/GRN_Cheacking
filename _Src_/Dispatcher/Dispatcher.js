@@ -1,37 +1,45 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import axios from 'axios';
+import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-picker';
+import { Checkbox, Divider, TextInput, Button, List } from 'react-native-paper';
 import { Card } from 'react-native-shadow-cards';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Divider } from 'react-native-paper';
 import AppConstants from '../AppConstant';
 
-const Checker = ({ navigation }) => {
+const Dispatcher = ({ navigation }) => {
 
     useEffect(() => {
-        ApiCall()
+        ApiCall();
     }, [])
 
-    const [filterBillDetais, setfilterBillDetais] = useState([])
-    const [refreshing, setRefreshing] = React.useState(false);
 
-    // Api Call for getcounterbillall 
+    const [filterBillDetais, setfilterBillDetais] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [NoBox, setNoBox] = useState();
+    const [expanded, setExpanded] = React.useState(true);
+    const [newArr, setnewArr] = useState([]);
+
+
+    // Api Call getcounterbillall
     async function ApiCall() {
 
-        setRefreshing(true);
+        // setRefreshing(true);
 
-        let senddataapi = {
+        var senddataapi = {
             "domainrecno": 508,
-            "status": "C"
+            "status": "D"
         }
 
         const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
-        console.log("FilterBillData", FilterBillData.data.Message)
-        
-        setfilterBillDetais(FilterBillData.data.Message);
+        // console.log("APIRES: /getcounterbillall/",FilterBillData.data.Message)
 
-        setRefreshing(false);
+        setfilterBillDetais(FilterBillData.data.Message)
+
     }
+
+
 
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
@@ -46,7 +54,6 @@ const Checker = ({ navigation }) => {
         return dt;
     };
 
-    // Formating Function For time
     function showTime(time) {
 
         let n = time;
@@ -56,6 +63,29 @@ const Checker = ({ navigation }) => {
         return Time
     }
 
+
+    // console.log('filterBillDetais----', filterBillDetais)
+
+
+    // Function to check all checkbox is true  
+    function patchData() {
+        const result = filterBillDetais.filter(Check);
+
+        function Check(item) {
+            return item.isChecked == true;
+        }
+        // console.log("Check------>", result.length)
+        if (result.length > 0) {
+            addcounterbill(result);
+            // alert('Success');
+        }
+        else {
+            alert('Please Select Min one Bill')
+        }
+    }
+
+
+    // Render Item (function)
     function renderItems({ item, index }) {
         return (
             <>
@@ -63,20 +93,10 @@ const Checker = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ItemList', { billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('DispatcherItem', { billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 20, }}>
 
-                            {/* <View style={{ flex: 1, flexDirection: 'row' }}> */}
-
-                            {/* <View style={{ flex: 1 }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Date: {showDate_ddmmyy(item.trdate)} </Text>
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Bill No. : {item.billno} </Text>
-                                    </View>
-                                </View> */}
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
                             </View>
 
@@ -124,19 +144,21 @@ const Checker = ({ navigation }) => {
 
     return (
         <View style={{ flex: 1 }}>
+
             <FlatList
                 data={filterBillDetais}
                 renderItem={renderItems}
                 showsVerticalScrollIndicator={true}
                 // onEndReached={onEndReachedHandler}
-                keyExtractor={(item) => item.recno.toString()}
+                keyExtractor={(item) => item.recno}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={ApiCall} />}
             />
+
         </View>
     )
 }
 
-export default Checker
+export default Dispatcher
 
 const styles = StyleSheet.create({
 
@@ -164,7 +186,8 @@ const styles = StyleSheet.create({
         flex: 0.3,
         alignSelf: 'center',
         // height:'64%',
-        borderRadius: 20,
+        borderRadius: 10,
+        width: '90%'
 
     },
 })

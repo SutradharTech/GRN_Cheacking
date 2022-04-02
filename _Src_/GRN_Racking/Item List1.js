@@ -23,9 +23,10 @@ const Item_list1 = ({ route, navigation }) => {
     const [warehouseList, setwarehouseList] = useState([])
     const [selectedWarehouseRecno, setSelectedWarehouseRecno] = useState();
 
+    const { item: i, GrnCall } = route.params;
 
     useEffect(() => {
-        var ab = route.params.item.map((item, index) => {
+        var ab = i.map((item, index) => {
 
             return { ...item }
         })
@@ -64,6 +65,7 @@ const Item_list1 = ({ route, navigation }) => {
     }
     console.log('Location===', LocationData)
 
+
     async function Postdomainitemlocation(item) {
 
         console.log('item------------>', item)
@@ -73,7 +75,7 @@ const Item_list1 = ({ route, navigation }) => {
             "domainrecno": 508,                                     // needs to be change 
             "itembatchno": item.itembatchno,
             "qty": item.qty,
-            "active": true                                         // needs to be change
+            "active": true,                                         // needs to be change
         }
 
         const respo = await axios.post(`${AppConstants.APIurl}/domainitemlocation/`, { postData })
@@ -186,6 +188,7 @@ const Item_list1 = ({ route, navigation }) => {
 
                                 <Picker
                                     selectedValue={item.Warehouse}
+                                    
                                     onValueChange={(itemValue) => {
 
                                         setSelectedWarehouseRecno(itemValue.recno)
@@ -201,8 +204,8 @@ const Item_list1 = ({ route, navigation }) => {
                                     }
                                 // mode='dropdown'
                                 >
-                                    <Picker.Item label={"select warehouse"} value={"564556"} />
-
+                                    {/* <Picker.Item label={"select warehouse"} value={"564556"} /> */}
+                                    <Picker.Item label={"Scientific "} value={"564556"} />
                                     {
                                         warehouseList.map(item => {
 
@@ -273,7 +276,9 @@ const Item_list1 = ({ route, navigation }) => {
                         list.map((item, index) => {
                             Postdomainitemlocation(item)
                         })
-                        navigation.navigate('Item_table1', { list })
+                        GrnCall();
+                        // navigation.navigate('Item_table1', { list })
+                        navigation.navigate('Grn_list1');
                     }}
                 >
                     <Text style={{ color: 'white', fontSize: 20 }}>Done</Text>

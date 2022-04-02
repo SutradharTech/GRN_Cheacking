@@ -3,32 +3,34 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Divider } from 'react-native-paper';
-import AppConstants from '../AppConstant';
+import { Button, Divider } from 'react-native-paper';
+import AppConstants from '../../AppConstant';
 
-const Checker = ({ navigation }) => {
+const RevertedList = ({ navigation }) => {
 
     useEffect(() => {
         ApiCall()
     }, [])
 
-    const [filterBillDetais, setfilterBillDetais] = useState([])
+    const [filterBillDetails, setfilterBillDetails] = useState([])
     const [refreshing, setRefreshing] = React.useState(false);
 
-    // Api Call for getcounterbillall 
+    // Api Call
+
     async function ApiCall() {
+
+        console.log("Api Data // getcounterbillall", "domairecno :", 508, "status :", "P")
 
         setRefreshing(true);
 
-        let senddataapi = {
+        var sendapidata = {
             "domainrecno": 508,
-            "status": "C"
+            "status": "RM"
         }
 
-        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
-        console.log("FilterBillData", FilterBillData.data.Message)
-        
-        setfilterBillDetais(FilterBillData.data.Message);
+        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', sendapidata);
+        console.log("ApiRes // getcounterbillall", FilterBillData.data.Message)
+        setfilterBillDetails(FilterBillData.data.Message);
 
         setRefreshing(false);
     }
@@ -46,7 +48,6 @@ const Checker = ({ navigation }) => {
         return dt;
     };
 
-    // Formating Function For time
     function showTime(time) {
 
         let n = time;
@@ -57,24 +58,15 @@ const Checker = ({ navigation }) => {
     }
 
     function renderItems({ item, index }) {
+        console.log("item----------------", item)
         return (
             <>
                 <View style={{ flex: 1, margin: "1%", marginVertical: '3%' }}>
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ItemList', { billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { message: filterBillDetails.message, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
 
-                            {/* <View style={{ flex: 1, flexDirection: 'row' }}> */}
-
-                            {/* <View style={{ flex: 1 }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Date: {showDate_ddmmyy(item.trdate)} </Text>
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Bill No. : {item.billno} </Text>
-                                    </View>
-                                </View> */}
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
@@ -125,7 +117,7 @@ const Checker = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={filterBillDetais}
+                data={filterBillDetails}
                 renderItem={renderItems}
                 showsVerticalScrollIndicator={true}
                 // onEndReached={onEndReachedHandler}
@@ -136,7 +128,7 @@ const Checker = ({ navigation }) => {
     )
 }
 
-export default Checker
+export default RevertedList
 
 const styles = StyleSheet.create({
 
@@ -168,3 +160,13 @@ const styles = StyleSheet.create({
 
     },
 })
+
+
+
+// <FlatList
+// data={categoryitems}
+// renderItem={renderItems}
+// showsVerticalScrollIndicator={true}
+// onEndReached={onEndReachedHandler}
+// keyExtractor={(item) => item.recno.toString()}
+// />

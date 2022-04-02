@@ -1,66 +1,55 @@
-import React, { useEffect, useState,  } from 'react'
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity, FlatList, StatusBar, KeyboardAvoidingView, RefreshControl, } from 'react-native'
-import { Divider, Searchbar, Provider } from 'react-native-paper'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, KeyboardAvoidingView, Pressable, StatusBar, RefreshControl } from 'react-native'
+import { Searchbar } from 'react-native-paper'
 import { Card } from 'react-native-shadow-cards'
 import axios from 'axios'
-import ModalDropdown from 'react-native-modal-dropdown';
-// import { Picker } from '@react-native-community/picker';
-import AppConstants from '../AppConstant'
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import AppConstants from '../AppConstant'
 
-const Grn_list1 = ({ navigation }) => {
+const Grn_list = ({ navigation }) => {
 
     // API Call
 
+    const [searchBill, setSearchBill] = useState();
     const [ApiData, setApiData] = useState([])
-    const [searchBill, setSearchBill] = React.useState('');
     const [masterDataSource, setMasterDataSource] = useState([])
     const [isPressed, setisPressed] = useState(false)
-    const [refreshing, setrefreshing] = useState(false);
+    const [refreshing, setRefreshing] = React.useState(false);
 
     useEffect(() => {
         GrnCall()
     }, [])
 
     async function GrnCall() {
-        
-        setrefreshing(true);
 
-        let senddataapi = {
-            "domainrecno": 508, 
-            "status": 'R'
-        }        
-        
-        // const res = await axios.post('https://dev.sutradhar.tech/bcore/api/v1/racking/', { "domainrecno": 508,"fromdate": 20211001,"today": 15112021 });
-
-        const res = await axios.post(AppConstants.APIurl1 +'/filtergrn/', senddataapi)
-        console.log('racking data', res.data)
+        setRefreshing(true);
+        // const res = await axios.post('https://dev.sutradhar.tech/sutrapos1/api/v1/getgrnall/', { "domainrecno": 505 });
+        const res = await axios.post(AppConstants.APIurl1 + '/filtergrn/', { "domainrecno": 508, "status": "A" });
+        // console.log('data', res.data)
         setApiData(res.data.Message);
         setMasterDataSource(res.data.Message);
+        console.log('!!!!API DATA!!!!!', ApiData);
 
-        var add = ApiData.map((item, index) => {
-            return { ...item }
-        })
-        // console.log('add==>', add)
+        setRefreshing(false);
 
-        setrefreshing(false);
     }
-    console.log("ApiData", ApiData)
 
-    // Finish Api Api_call
+
+    // Search Function by billno
 
     const searchFilterFunction = (text) => {
         // Search function to search GRN bill number in GRN list
+
         if (text) {
             const newData = masterDataSource.filter(
                 function (item) {
-                    const itemDataTitle = (item.billno)
-                        ? (item.billno.toUpperCase())
-                        : ''.toUpperCase();
-
+                    const itemDataTitle = item.billno
+                        ? item.billno
+                        : '';
                     const textData = text.toUpperCase();
-                    return itemDataTitle.indexOf(textData) > -1;
+
+                    return (itemDataTitle).toString().indexOf(textData) > -1;
                 });
 
             setApiData(newData);
@@ -70,6 +59,7 @@ const Grn_list1 = ({ navigation }) => {
             setSearchBill(text);
         }
     };
+
 
     const Render1 = ({ item, index }) => {
 
@@ -92,31 +82,29 @@ const Grn_list1 = ({ navigation }) => {
         }
 
         return (
-           
             <View style={{ padding: '5%', flex: 1, }}>
-                <StatusBar backgroundColor='#ffae42' />
-
+                <StatusBar backgroundColor={'orange'} />
                 <Card style={styles.card}>
+                    <Pressable onPress={() => navigation.navigate('Item_list', { item: item, GrnCall:GrnCall })}>
 
-                    <TouchableOpacity onPress={() => navigation.navigate('Item_list1', { item: item.items })}>
                         <View style={styles.rows1}>
 
-                            <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                            <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill No :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.billno}</Text>
                             </View>
-                            <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                            <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Date :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showDate(item.trdate)}</Text>
                             </View>
-                            <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                            <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Time :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showTime(item.trtime)}</Text>
                             </View>
                         </View>
 
                         <View style={styles.rows2}>
-                            <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                            <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Mobile :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.mobile}</Text>
                             </View>
@@ -124,62 +112,22 @@ const Grn_list1 = ({ navigation }) => {
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Amount :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.amount}</Text>
                             </View>
-                            <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                            <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Status :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.status}</Text>
                             </View>
 
                         </View>
-                    </TouchableOpacity>
 
-                    <Divider style={{ marginHorizontal: '5%' }} />
+                    </Pressable>
+                </Card>
 
-                    <View style={{ marginHorizontal: '5%', flexDirection: 'row', }}>
-
-                        
-                        {/* <View style={{ flex: 0.7, marginBottom: '2%', marginLeft: '2%', }}> */}
-
-                            {/* <Picker
-                                selectedValue={item.Warehouse}
-                                onValueChange={(itemValue) => {
-
-                                    setSelectedWarehouse(itemValue.recno)
-                                    console.log('------', selectedWarehouse)
-                                    setApiData(p => {
-                                        var newdata = p
-                                        newdata[index].Warehouse = itemValue
-                                        console.log("newdata", newdata)
-
-                                        return [...newdata]
-                                    })
-                                }
-                                } */}
-                            {/* // mode='dropdown' */}
-                            {/* > */}
-                            {/* <Picker.Item label={"select warehouse"} value={"564556"} /> */}
-                            {/* 
-                                {
-                                    warehouse.map(item => {
-
-                                        return (
-                                            <Picker.Item label={item.descn} value={item} />
-                                        )
-                                    })
-                                }
-
-                            </Picker> */}
-
-                        {/* </View> */}
-
-                    </View>
-
-                </Card >
-
-            </View >
+            </View>
         );
     }
 
     return (
+
         <KeyboardAvoidingView style={styles.main} behavior='height' enabled={false}>
 
             {
@@ -190,7 +138,7 @@ const Grn_list1 = ({ navigation }) => {
 
                             <FontAwesome5 name={'warehouse'} size={23} color={'black'} style={{ marginTop: 15 }} />
 
-                            <Text style={{ ...styles.header, color: 'black', fontSize: 24 }}>Material Racking</Text>
+                            <Text style={{ ...styles.header, color: 'black', fontSize: 24 }}>GRN</Text>
 
                             <TouchableOpacity onPress={() => setisPressed(!isPressed)} >
                                 <EvilIcons name={'search'} size={33} color={'black'} style={{ marginTop: 15 }} />
@@ -219,7 +167,7 @@ const Grn_list1 = ({ navigation }) => {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
 
                             <FontAwesome5 name={'warehouse'} size={23} color={'black'} style={{ marginTop: 15 }} />
-                            <Text style={styles.header}>Material Racking</Text>
+                            <Text style={styles.header}>GRN</Text>
 
                             <TouchableOpacity onPress={() => setisPressed(!isPressed)} >
                                 <EvilIcons name={'search'} size={33} color={'black'} style={{ marginTop: 15 }} />
@@ -244,7 +192,7 @@ const Grn_list1 = ({ navigation }) => {
     )
 }
 
-export default Grn_list1
+export default Grn_list
 
 const styles = StyleSheet.create({
     main: {
@@ -252,6 +200,78 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'ghostwhite',
 
+    },
+    header_view: {
+        flex: 0.15,
+        justifyContent: 'flex-end',
+        // backgroundColor: 'red',
+        // width: '100%',
+        // flexDirection: 'row'
+
+    },
+    card: {
+        flex: 0.3,
+        padding: '2%',
+        borderRadius: 20,
+    },
+    card_text: {
+        // backgroundColor:'blue',
+        flex: 1,
+        alignItems: 'center',
+    },
+    rows: {
+        flexDirection: "row",
+        flex: 0,
+        justifyContent: 'space-evenly',
+        // backgroundColor: 'red',
+        marginTop: '5%'
+
+    },
+    Touch_op: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginHorizontal: 40,
+        backgroundColor: 'darkorange',
+        height: 30,
+        width: '100%',
+        borderRadius: 20
+    },
+    Save_op: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 15,
+        fontFamily: 'monospace',
+    },
+    content_text: {
+        fontSize: 15,
+        color: 'black',
+        marginLeft: '2%',
+        marginVertical: '1%'
+    },
+    card_text: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    rows: {
+        flexDirection: "row",
+        flex: 0.3,
+        justifyContent: 'space-evenly',
+        marginVertical: '3%',
+        flexWrap: 'wrap'
+
+
+    },
+    rows1: {
+        flexDirection: "row",
+        flex: 0.3,
+        justifyContent: 'space-evenly',
+        marginVertical: '3%'
+    },
+    rows2: {
+        flexDirection: "row",
+        flex: 0.3,
+        justifyContent: 'space-evenly',
+        marginVertical: '3%',
     },
     Search_header_view: {
         flex: 0.29,
@@ -274,92 +294,6 @@ const styles = StyleSheet.create({
         // borderBottomStartRadius: 30,
         // backgroundColor: 'red'
     },
-    header: {
-        textAlign: 'center',
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'black',
-        marginTop: 15,
-        fontFamily: 'sans-serif-light'
-
-    },
-    card: {
-        flex: 0.3,
-        // alignSelf: 'center',
-        // height:'64%',
-        borderRadius: 20,
-
-    },
-    content_text: {
-        fontSize: 15,
-        color: 'black',
-        // marginLeft: '10%'
-    },
-    card_text: {
-        // backgroundColor:'blue',
-        flex: 1,
-        alignItems: 'center',
-    },
-    rows: {
-        flexDirection: "row",
-        flex: 0,
-        justifyContent: 'space-evenly',
-        // backgroundColor: 'red',
-        marginTop: '5%',
-
-    },
-    Touch_op: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        // marginHorizontal: 40,
-        backgroundColor: 'darkorange',
-        height: 30,
-        width: '100%',
-        borderRadius: 20
-    },
-    Save_op: {
-        color: 'white',
-        textAlign: 'center',
-        fontSize: 15,
-        fontFamily: 'monospace',
-    },
-
-    card: {
-        flex: 0.3,
-        borderRadius: 20,
-
-    },
-    content_text: {
-        fontSize: 15,
-        color: 'black',
-        marginLeft: '2%',
-        marginVertical: '1%'
-    },
-    card_text: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    rows1: {
-        flexDirection: "row",
-        flex: 0.3,
-        justifyContent: 'space-evenly',
-        marginVertical: '2%',
-
-    },
-    rows2: {
-        flexDirection: "row",
-        flex: 0.3,
-        justifyContent: 'space-evenly',
-        marginVertical: '2%',
-
-    },
-    modal_dropdown: {
-        borderBottomWidth: 0.3,
-        borderColor: 'black',
-        height: 30,
-        justifyContent: 'center',
-        paddingLeft: '2%'
-    },
     header_subView: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -373,6 +307,16 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 20,
         // backgroundColor: 'red'
     },
+
+    header: {
+        textAlign: 'center',
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'black',
+        marginTop: 15,
+        fontFamily: 'sans-serif-light'
+
+    },
     search_bar: {
         width: '65%',
         height: 40,
@@ -381,6 +325,4 @@ const styles = StyleSheet.create({
         // borderColor: 'grey',
         // borderWidth: 0.3
     }
-
-
 })
