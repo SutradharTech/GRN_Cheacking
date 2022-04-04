@@ -2,9 +2,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react
 import React, { useState, useEffect } from 'react';
 import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-picker';
 import { Card } from 'react-native-shadow-cards';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../AppFunction';
 import AppConstants from '../AppConstant';

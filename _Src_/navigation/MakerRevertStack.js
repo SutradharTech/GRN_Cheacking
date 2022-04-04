@@ -9,8 +9,8 @@ const MakerRevertStack = () => {
   return (
     <Stack.Navigator initialRouteName='RevertedList' >
 
-        <Stack.Screen name="RevertedList" component={RevertedList} options={{ headerShown: true,  }} />
-        <Stack.Screen name="RevertedItems" component={RevertedItems} options={{ headerShown: true, animation: 'slide_from_right'}} />
+        <Stack.Screen name="RevertedList" component={RevertedList} options={{ headerShown: false,  }} />
+        <Stack.Screen name="RevertedItems" component={RevertedItems} options={{ headerShown: false, animation: 'slide_from_right'}} />
 
       </Stack.Navigator>
   )
