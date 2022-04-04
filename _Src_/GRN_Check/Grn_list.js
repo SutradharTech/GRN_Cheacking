@@ -38,27 +38,27 @@ const Grn_list = ({ navigation }) => {
 
     // Search Function by billno
 
-    const searchFilterFunction = (text) => {
-        // Search function to search GRN bill number in GRN list
+    // const searchFilterFunction = (text) => {
+    //     // Search function to search GRN bill number in GRN list
 
-        if (text) {
-            const newData = masterDataSource.filter(
-                function (item) {
-                    const itemDataTitle = item.billno
-                        ? item.billno
-                        : '';
-                    const textData = text.toUpperCase();
+    //     if (text) {
+    //         const newData = masterDataSource.filter(
+    //             function (item) {
+    //                 const itemDataTitle = item.billno
+    //                     ? item.billno
+    //                     : '';
+    //                 const textData = text.toUpperCase();
 
-                    return (itemDataTitle).toString().indexOf(textData) > -1;
-                });
+    //                 return (itemDataTitle).toString().indexOf(textData) > -1;
+    //             });
 
-            setApiData(newData);
-            setSearchBill(text);
-        } else {
-            setApiData(masterDataSource);
-            setSearchBill(text);
-        }
-    };
+    //         setApiData(newData);
+    //         setSearchBill(text);
+    //     } else {
+    //         setApiData(masterDataSource);
+    //         setSearchBill(text);
+    //     }
+    // };
 
 
     const Render1 = ({ item, index }) => {
@@ -130,7 +130,7 @@ const Grn_list = ({ navigation }) => {
 
         <KeyboardAvoidingView style={styles.main} behavior='height' enabled={false}>
 
-            {
+            {/* {
                 isPressed ? (
                     <View style={styles.Search_header_view}>
 
@@ -176,7 +176,7 @@ const Grn_list = ({ navigation }) => {
                         </View>
                     </View>
                 )
-            }
+            } */}
             <View style={{ flex: 1.3, borderTopLeftRadius: 50, borderTopRightRadius: 50, }}>
 
                 <FlatList

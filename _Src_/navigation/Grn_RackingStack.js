@@ -11,9 +11,9 @@ const Grn_RackingStack = () => {
   return (
     <Stack.Navigator>
 
-        <Stack.Screen name="Grn_list1" component={Grn_list1} options={{ headerShown: false, }} />
-        <Stack.Screen name="Item_list1" component={Item_list1} options={{ headerShown: true, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
-        <Stack.Screen name="Item_table1" component={Item_table1} options={{ headerShown: true, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
+        <Stack.Screen name="Grn_list1" component={Grn_list1} options={{ headerShown: false,title: 'Material Racking' }} />
+        <Stack.Screen name="Item_list1" component={Item_list1} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
+        <Stack.Screen name="Item_table1" component={Item_table1} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
 
       </Stack.Navigator>
   )

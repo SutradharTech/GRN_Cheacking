@@ -5,9 +5,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import Grn_CheckingStack from '../navigation/Grn_CheckingStack';
 import Grn_RackingStack from '../navigation/Grn_RackingStack';
-import Grn_MakerStack from '../navigation/MakerStack';
-import Grn_CheckerStack from '../navigation/CheckerStack';
-import Grn_PackerStack from '../navigation/Grn_PackerStack';
 import DispatcherStack from '../navigation/DispatcherStack';
 import TransportStack from '../navigation/TransportStack';
 import TransportFormStack from '../navigation/TransportFormStack';
@@ -20,6 +17,7 @@ import CustomerStack from '../navigation/CustomerStack';
 import MakerTab from '../navigation/MakerTab';
 import Grn_accept from '../Accept_Grn/Grn_accept';
 import PackerStack from '../navigation/Grn_PackerStack';
+import CheckerStack from '../navigation/CheckerStack';
 
 export const GRN = createContext();
 
@@ -105,7 +103,7 @@ const Auth = () => {
           {/*  Accept Grn  */}
           <Drawer.Screen name="Accept Grn" component={Accept_Grn}
             options={{
-              headerShown: false,
+              headerShown: true,
               drawerIcon: ({ focused, size }) => (
                 <FontAwesome
                   name="user-md"
@@ -118,7 +116,7 @@ const Auth = () => {
           {/* Accept GRN */}
           <Drawer.Screen name="GRN Check" component={GRN_Check}
             options={{
-              headerShown: false,
+              headerShown: true,
               drawerIcon: ({ focused, size }) => (
                 <FontAwesome
                   name="user-md"
@@ -131,7 +129,7 @@ const Auth = () => {
           {/*  Racking  */}
           <Drawer.Screen name="Grn Racking" component={Grn_Racking}
             options={{
-              headerShown: false,
+              headerShown: true,
               drawerIcon: ({ focused, size }) => (
                 <MaterialIcons
                   name="emoji-transportation"
@@ -145,7 +143,7 @@ const Auth = () => {
           {/*  Maker  */}
           <Drawer.Screen name="Maker" component={MakerFun}
             options={{
-              headerShown: false,
+              headerShown: true,
               drawerIcon: ({ focused, size }) => (
                 <MaterialIcons
                   name="emoji-transportation"

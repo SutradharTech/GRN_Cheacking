@@ -182,7 +182,7 @@ const Grn_list1 = ({ navigation }) => {
     return (
         <KeyboardAvoidingView style={styles.main} behavior='height' enabled={false}>
 
-            {
+            {/* {
                 isPressed ? (
                     <View style={styles.Search_header_view}>
 
@@ -228,7 +228,7 @@ const Grn_list1 = ({ navigation }) => {
                         </View>
                     </View>
                 )
-            }
+            } */}
             <View style={{ flex: 1.3, borderTopLeftRadius: 50, borderTopRightRadius: 50, }}>
 
                 <FlatList
