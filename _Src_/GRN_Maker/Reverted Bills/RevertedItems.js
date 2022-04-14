@@ -15,38 +15,41 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const RevertedItems = ({ route, navigation }) => {
 
   const [list, setlist] = useState();
-  const [Salebillfooter, setsalebillfooter] = useState();
   const [flag, setflag] = useState(false);
   const [SelectedBatch, setSelectedBatch] = useState();
-  const [listHeader, setlistHeader] = useState();
+  const [listHeader, setlistHeader] = useState([]);
   const [dialog, setdialog] = useState(false);
   const [visible, setVisible] = React.useState(true);
+  const [itemBatchList, setitemBatchList] = useState([]);
 
-  const { billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
+  const { custName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
   // console.log('i=>', i);
 
   useEffect(() => {
     getcounterbill();
+    getbatchno();
   }, [])
 
 
   console.log("list ---> ", list)
 
+  // Api Call for ItemBatch List
+  async function getbatchno() {
 
-  const showDialog = () => setdialog(true);
+    console.log("ApiCall // getbatchno", "domainrecno:", 508, "itemrecno:", null);
 
-  const hideDialog = () => setdialog(false);
+    var sendapidata = {
+      "domainrecno": 508,
+      "itemrecno": null
 
+    }
 
-  var BatchList = [
-    { name: 'A1', value: 0 },
-    { name: 'B1', value: 1 },
-    { name: 'C1', value: 2 },
-    { name: 'D1', value: 3 },
-    // { name: '', value: 2 },
-    // { name: 'Shrink', value: 2 },
-  ]
+    const { data: ItemBatchData } = await axios.post(AppConstants.APIurl2 + 'getstockdata/', sendapidata);
+    // console.log("ApiRes // getcounterbill", ItemBatchData.Message)
 
+    setitemBatchList(ItemBatchData.Message);
+
+  }
 
   // Api Call for items according to bill
   async function getcounterbill() {
@@ -63,107 +66,33 @@ const RevertedItems = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message.items)
 
     setlistHeader(UpdateBillData.Message);
+    setlist(UpdateBillData.Message.items);
 
-    if (UpdateBillData.Success == true) {
-      setlist(UpdateBillData.Message.items);
-    }
+    // if (UpdateBillData.Success == true) {
+    // }
 
   }
 
   console.log('listHeader----', listHeader);
 
   // Post Api Call (Send to next page) 
-  async function addcounterbill(itm) {
+  async function addcounterbill() {
+
+    console.log("Api Call / RevertedItems / addcounterbill", "listHeader:", listHeader, "status:", "Ch", "makerdate:", AppFunction.getToday().dataDate, "makertime:", AppFunction.getTime().dataTime)
 
     let senddataapi = {
-      "items": [
-         {
-           "recno": itm.recno,
-           "shortguid": itm.shortguid,
-           "itemrecno": itm.itemrecno,
-           "itembatchno": itm.itembatchno,
-           "expdate": itm.expdate,
-           "qty": itm.qty,
-           "rate": itm.rate,
-           "amount": itm.amount,
-           "discountamt": itm.discountamt,
-           "picked": !itm.picked,
-           "active": itm.active,
-           "approvalstatus": itm.approvalstatus,
-           "descn": itm.descn,
-           "code": itm.code,
-           "hsn": itm.hsn,
-           "cgstrate": itm.cgstrate,
-           "igstrate": itm.igstrate,
-           "sgstrate": itm.sgstrate,
-           "packtyperecno": itm.packtyperecno,
-           "packtypedescn": itm.packtypedescn,
-           "categoryrecno": itm.categoryrecno,
-           "categorydescn": itm.categorydescn,
-           "uomrecno": itm.uomrecno,
-           "UOM": itm.UOM,
-           "salerate": itm.salerate,
-           "mrp": itm.mrp,
-         }
-       ],
-       "image": "",
-       "custDescn": listHeader.custDescn,
-       "creditallowed": listHeader.creditallowed,
-       "shortguid": listHeader.shortguid,
-       "customerdomainrecno": listHeader.customerdomainrecno,
-       "customerrecno": listHeader.customerrecno,
-       "mobile": listHeader.mobile,
-       "trdate": listHeader.trdate,
-       "trtime": listHeader.trtime,
-       "billno": listHeader.billno,
-       "lockedby": listHeader.lockedby,
-       "lockedby": listHeader.lockedby,
-       "status": "C",
-       "message": listHeader.message,
-       "makerdate": AppFunction.getToday().dataDate,
-       "makertime": AppFunction.getTime().dataTime,
-       "checkerdate": listHeader.checkerdate,
-       "checkertime": listHeader.checkertime,
-       "packerdate": listHeader.packerdate,
-       "packertime": listHeader.packertime,
-       "dispatchdate": listHeader.dispatchdate,
-       "dispatchtime": listHeader.dispatchtime,
-       "transportpickup": listHeader.transportpickup,
-       "transportdate": listHeader.transportdate,
-       "transporttime": listHeader.transporttime,
-       "receiverdate": listHeader.receiverdate,
-       "receivertime": listHeader.receivertime,
-       "boxes": listHeader.boxes,
-       "active": listHeader.active,
-       "amount": listHeader.amount,
-       "discountamt": listHeader.discountamt,
-       "logo": listHeader.logo,
-       "cashamt": listHeader.cashamt,
-       "cardamt": listHeader.cardamt,
-       "walletamt": listHeader.walletamt,
-       "pointsamt": listHeader.pointsamt,
-       "creditamt": listHeader.creditamt,
-       "salereturnamt": listHeader.salereturnamt,
-       "cardrefid": listHeader.cardrefid,
-       "walletrefid": listHeader.walletrefid,
-       "cgstamt": listHeader.cgstamt,
-       "sgstamt": listHeader.sgstamt,
-       "igstamt": listHeader.igstamt,
-       "roundamt": listHeader.roundamt,
-       "spotdiscountamt": listHeader.spotdiscountamt,
-       "tokenno": listHeader.tokenno,
-       "domainposrecno": listHeader.domainposrecno,
-       "domainrecno": listHeader.domainrecno,
-       "domainuserrecno": listHeader.domainuserrecno
-     }
- 
+      ...listHeader,
+      status: "RC",
+      makerdate: AppFunction.getToday().dataDate,
+      makertime: AppFunction.getTime().dataTime
+    }
 
     console.log('senddataapi----', senddataapi);
 
-    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-    console.log("ApiRes // addcounterbill", UpdateBillData)
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes // addcounterbill", res.data.Messages)
 
-    if (UpdateBillData.Success == true) {
+    if (res.data.Success == true) {
       ApiCall();
       navigation.navigate('RevertedList');
     }
@@ -171,19 +100,19 @@ const RevertedItems = ({ route, navigation }) => {
   }
 
 
-   // Function to check all checkbox is true  
-   function SubmitCondition() {
+  // Function to check all checkbox is true  
+  function SubmitCondition() {
     const result = list.filter(Check);
 
     function Check(item) {
       return item.picked == false;
     }
-    console.log("Check------>", result.length)
+    console.log("Picked------>", result.length)
     if (result.length == 0) {
-      list.map((itm) => {
-        console.log('itm=======', itm);
-        addcounterbill(itm);
-      })
+      // list.map((itm) => {
+      //   console.log('itm=======', itm);
+      // })
+      addcounterbill();
     }
     else {
       alert('Please Check All box')
@@ -218,8 +147,8 @@ const RevertedItems = ({ route, navigation }) => {
   }
 
 
-   // Checkbox Select Api Call
-   async function counterbillfooter(item) {
+  // Checkbox Select Api Call
+  async function counterbillfooter(item) {
 
     console.log("ApiCall // counterbillfooter/", item);
 
@@ -234,6 +163,7 @@ const RevertedItems = ({ route, navigation }) => {
       "amount": item.amount,
       "discountamt": item.discountamt,
       "picked": item.picked,
+      "checked": item.checked,
       "active": item.active,
       "approvalstatus": item.approvalstatus,
       "descn": item.descn,
@@ -260,7 +190,6 @@ const RevertedItems = ({ route, navigation }) => {
 
     const FooterBillData = await axios.patch(AppConstants.APIurl2 + 'counterbillfooter/', senddataapi);
     console.log("ApiRes // counterbillfooter/", FooterBillData.data)
-    // setsalebillfooter(FooterBillData.data);
   }
 
 
@@ -268,11 +197,23 @@ const RevertedItems = ({ route, navigation }) => {
   const ListHeader = () => {
     //View to set in Header
     return (
-      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-        <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-        <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 18, marginRight: '35%' }}>{listHeader?.custDescn}</Text>
+      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', }}>
 
-        <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisible(!visible)} />
+        <View style={{ flexDirection: 'row', flex: 0.9, marginLeft: '3%', alignItems: 'center' }}>
+          <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '35%' }}>{custName}</Text>
+        </View>
+
+        <View style={{ flex: 0.6 }}>
+
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '35%' }}>Created By</Text>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '35%' }}>{From}</Text>
+
+        </View>
+
+        <View style={{ marginRight: '2%', flex: 0.15 }}>
+          <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisible(!visible)} />
+        </View>
       </Card>
     );
   };
@@ -296,22 +237,18 @@ const RevertedItems = ({ route, navigation }) => {
 
               {/* Checkbox View */}
 
-              <View style={{ flex: 0.9, justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 12, flexDirection: 'row' }}>
+              <View style={{ flex: 0.3, justifyContent: 'space-evenly', alignItems: 'center', borderRadius: 12, flexDirection: 'row' }}>
 
-                <View>
-                  {
-                    item.picked == false ? (<><Text style={{ fontWeight: '700', fontSize: 15, }}>Pick-up</Text></>) : (<><Text style={{ fontSize: 15, fontWeight: '700', color: 'dodgerblue' }}>Discard</Text></>)
-                  }
-                </View>
                 <View>
                   <Checkbox
 
                     color={'dodgerblue'}
                     // key={item.key}
-                    status={list[index].picked ? 'checked' : 'unchecked'}
+                    status={list[index].checked ? 'checked' : 'unchecked'}
                     onPress={(n) => {
-                      // console.log('n==>', n)
+
                       setlist((p) => {
+                      
                         p[index].picked = !p[index].picked;
                         let item = p[index];
                         counterbillfooter(item)
@@ -320,7 +257,11 @@ const RevertedItems = ({ route, navigation }) => {
 
                     }}
                   />
+                  {
+                    console.log("list---", list)
+                  }
                 </View>
+
               </View>
             </View>
 
@@ -379,29 +320,29 @@ const RevertedItems = ({ route, navigation }) => {
                   </View>
                 </View>
 
-                {/*  Expiry Date  */}
+                {/*  Expiry Date and MRP  */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
+
+
 
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
 
+                    {/* Expiry Date */}
                     <View>
                       <Text style={{ fontWeight: '400' }}>Expiry Date</Text>
                     </View>
                     <View>
 
-                      <TextInput
-                        style={{ fontWeight: '600', height: 30 }}
-                        defaultValue={showDate_ddmmyy(item.expdate)}
-                        onChangeText={(text) => {
-                          let dt = text;
-                          setlist((p) => {
-                            let formatdate = formatDate(dt);
-                            p[index].expdate = formatdate;
-                            return [...p]
-                          })
-                          console.log('Format Exp Date---------->', list)
-                        }}
-                      />
+                      <Text>{showDate_ddmmyy(item.expdate)}</Text>
+
+                    </View>
+
+                    {/* MRP */}
+                    <View>
+                      <Text style={{ fontWeight: '600' }}>MRP</Text>
+                    </View>
+                    <View>
+                      <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
                     </View>
 
                   </View>
@@ -412,9 +353,21 @@ const RevertedItems = ({ route, navigation }) => {
 
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginTop: '5%' }}>
+            {/*  free  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '60%', marginTop: '4%', }}>
+
+              <Text>Free</Text>
+              <Text>{item?.free}</Text>
+
+            </View>
+
+            {/*  Box Atributes  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', marginTop: '5%', }}>
               <Text>Box</Text>
-              <Text style={{ fontSize: 17 }}> {item?.outerbox}  X  {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <Text style={{ fontSize: 17 }}> {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <View>
+                <Checkbox />
+              </View>
             </View>
 
             {/*  Batch No  */}
@@ -424,51 +377,40 @@ const RevertedItems = ({ route, navigation }) => {
                 <Text style={{ fontWeight: '400' }}>Batch No : </Text>
               </View>
 
-              <View>
-                <TextInput
-                  style={{ fontWeight: '600', height: 40 }}
-                  defaultValue={item.itembatchno}
-                  onChangeText={(text) => {
-                    setlist((p) => {
-                      p[index].itembatchno = text;
-                      return [...p]
-                    })
-                    console.log('p---------->', list)
-                  }}
-                />
-              </View>
-
               {/* Dropdown for batch seleection */}
-              {/* <Picker
-                selectedValue={SelectedBatch}
-                style={{ width: '40%' }}
+              <Picker
+                selectedValue={item.itembatchno}
+
+                style={{ width: '50%' }}
+
                 onValueChange={(BatchValue) => {
 
-                  setSelectedBatch(BatchValue.name) */}
-              {/* // console.log('------>',SelectedWarehouse.value)
-                  // setApiData(p => {
-                  //     var newdata = p
-                  //     newdata[index].Warehouse = itemValue
-                  //     console.log("newdata", newdata)
+                  setlist((p) => {
 
-                  //     return [...newdata]
-                  // })
+                    p[index].itembatchno = BatchValue.itembatchno
+                    p[index].expdate = BatchValue.expdate
+                    p[index].mrp = BatchValue.mrp
+                    return [...p]
+                  })
+
                 }
                 }
               // mode='dropdown' 
-              > */}
-              {/* <Picker.Item label={"select"} />
+              >
+                <Picker.Item label={item.itembatchno} />
 
                 {
-                  BatchList.map(batch => {
+                  itemBatchList.map((batch) => {
+                    if (batch.itemrecno == item.itemrecno) {
 
-                    return (
-                      <Picker.Item label={batch.name} value={batch} />
-                    )
+                      return (
+                        <Picker.Item label={batch.itembatchno} value={batch} />
+                      )
+                    }
                   })
                 }
 
-              </Picker> */}
+              </Picker>
 
             </View>
 
@@ -492,6 +434,7 @@ const RevertedItems = ({ route, navigation }) => {
               </View>
 
             </View>
+
 
           </Card>
         </View >

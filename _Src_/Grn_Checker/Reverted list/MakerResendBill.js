@@ -3,34 +3,32 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Button, Divider } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 import AppConstants from '../../AppConstant';
 
-const RevertedList = ({ navigation }) => {
+const MakerResendBill = ({ navigation }) => {
 
     useEffect(() => {
         ApiCall()
     }, [])
 
-    const [filterBillDetails, setfilterBillDetails] = useState([])
+    const [filterBillDetais, setfilterBillDetais] = useState([])
     const [refreshing, setRefreshing] = React.useState(false);
 
-    // Api Call
-
+    // Api Call for getcounterbillall 
     async function ApiCall() {
-
-        console.log("Api Data // getcounterbillall", "domairecno :", 508, "status :", "P")
 
         setRefreshing(true);
 
-        var sendapidata = {
+        let senddataapi = {
             "domainrecno": 508,
-            "status": "RM"
+            "status": "RC"
         }
 
-        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', sendapidata);
-        console.log("ApiRes // getcounterbillall", FilterBillData.data.Message)
-        setfilterBillDetails(FilterBillData.data.Message);
+        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
+        console.log("FilterBillData", FilterBillData.data.Message)
+        
+        setfilterBillDetais(FilterBillData.data.Message);
 
         setRefreshing(false);
     }
@@ -48,6 +46,7 @@ const RevertedList = ({ navigation }) => {
         return dt;
     };
 
+    // Formating Function For time
     function showTime(time) {
 
         let n = time;
@@ -58,23 +57,21 @@ const RevertedList = ({ navigation }) => {
     }
 
     function renderItems({ item, index }) {
-        console.log("item----------------", item)
         return (
             <>
                 <View style={{ flex: 1, margin: "1%", marginVertical: '3%' }}>
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn,From: item.userroledescn ,message: filterBillDetails.message, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ResendItems', { CustName: item.custdescn,From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 8, borderColor: 'orange', borderRadius: 18, }}>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
                             </View>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Created By :</Text>
-                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.userroledescn}</Text>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '400' }}>Created By</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', marginLeft: '4%' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />
@@ -122,7 +119,7 @@ const RevertedList = ({ navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             <FlatList
-                data={filterBillDetails}
+                data={filterBillDetais}
                 renderItem={renderItems}
                 showsVerticalScrollIndicator={true}
                 // onEndReached={onEndReachedHandler}
@@ -133,7 +130,7 @@ const RevertedList = ({ navigation }) => {
     )
 }
 
-export default RevertedList
+export default MakerResendBill
 
 const styles = StyleSheet.create({
 
@@ -165,13 +162,3 @@ const styles = StyleSheet.create({
 
     },
 })
-
-
-
-// <FlatList
-// data={categoryitems}
-// renderItem={renderItems}
-// showsVerticalScrollIndicator={true}
-// onEndReached={onEndReachedHandler}
-// keyExtractor={(item) => item.recno.toString()}
-// />

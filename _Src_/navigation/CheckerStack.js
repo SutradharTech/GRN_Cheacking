@@ -1,7 +1,7 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Checker from '../Grn_Checker/Checker';
-import ItemList from '../Grn_Checker/ItemList';
+import Checker from '../Grn_Checker/Checker Bill/Checker'
+import ItemList from '../Grn_Checker/Checker Bill/ItemList';
 
 const Stack = createNativeStackNavigator();
 

@@ -1,8 +1,9 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Dispatcher from '../Dispatcher/Dispatcher';
-import DispatcherItem from '../Dispatcher/Dispatchertem';
+import Dispatcher from '../Dispatcher/Dispatcher Bill/Dispatcher';
+import DispatcherItem from '../Dispatcher/Dispatcher Bill/Dispatchertem';
+
 
 const Stack = createNativeStackNavigator();
 

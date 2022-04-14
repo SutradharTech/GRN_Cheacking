@@ -1,39 +1,45 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import axios from 'axios';
+import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-picker';
+import { Checkbox, Divider, TextInput, Button, List, } from 'react-native-paper';
 import { Card } from 'react-native-shadow-cards';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Button, Divider } from 'react-native-paper';
 import AppConstants from '../../AppConstant';
 
 const RevertedList = ({ navigation }) => {
 
     useEffect(() => {
-        ApiCall()
+        ApiCall();
     }, [])
 
-    const [filterBillDetails, setfilterBillDetails] = useState([])
-    const [refreshing, setRefreshing] = React.useState(false);
 
-    // Api Call
+    const [filterBillDetais, setfilterBillDetais] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [NoBox, setNoBox] = useState();
+    const [expanded, setExpanded] = React.useState(true);
+    const [newArr, setnewArr] = useState([]);
 
+
+    // Api Call getcounterbillall
     async function ApiCall() {
 
-        console.log("Api Data // getcounterbillall", "domairecno :", 508, "status :", "P")
+        // setRefreshing(true);
 
-        setRefreshing(true);
-
-        var sendapidata = {
+        var senddataapi = {
             "domainrecno": 508,
-            "status": "RM"
+            "status": "D"
         }
 
-        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', sendapidata);
-        console.log("ApiRes // getcounterbillall", FilterBillData.data.Message)
-        setfilterBillDetails(FilterBillData.data.Message);
+        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
+        // console.log("APIRES: /getcounterbillall/",FilterBillData.data.Message)
 
-        setRefreshing(false);
+        setfilterBillDetais(FilterBillData.data.Message)
+
     }
+
+
 
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
@@ -57,24 +63,37 @@ const RevertedList = ({ navigation }) => {
         return Time
     }
 
+    // Function to check all checkbox is true  
+    function patchData() {
+        const result = filterBillDetais.filter(Check);
+
+        function Check(item) {
+            return item.isChecked == true;
+        }
+        // console.log("Check------>", result.length)
+        if (result.length > 0) {
+            addcounterbill(result);
+            // alert('Success');
+        }
+        else {
+            alert('Please Select Min one Bill')
+        }
+    }
+
+
+    // Render Item (function)
     function renderItems({ item, index }) {
-        console.log("item----------------", item)
         return (
             <>
                 <View style={{ flex: 1, margin: "1%", marginVertical: '3%' }}>
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn,From: item.userroledescn ,message: filterBillDetails.message, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn,billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 20, }}>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                {/* <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text> */}
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
-                            </View>
-
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Created By :</Text>
-                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />
@@ -121,14 +140,16 @@ const RevertedList = ({ navigation }) => {
 
     return (
         <View style={{ flex: 1 }}>
+
             <FlatList
-                data={filterBillDetails}
+                data={filterBillDetais}
                 renderItem={renderItems}
                 showsVerticalScrollIndicator={true}
                 // onEndReached={onEndReachedHandler}
-                keyExtractor={(item) => item.recno.toString()}
+                keyExtractor={(item) => item.recno}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={ApiCall} />}
             />
+
         </View>
     )
 }
@@ -161,17 +182,8 @@ const styles = StyleSheet.create({
         flex: 0.3,
         alignSelf: 'center',
         // height:'64%',
-        borderRadius: 20,
+        borderRadius: 10,
+        width: '90%'
 
     },
 })
-
-
-
-// <FlatList
-// data={categoryitems}
-// renderItem={renderItems}
-// showsVerticalScrollIndicator={true}
-// onEndReached={onEndReachedHandler}
-// keyExtractor={(item) => item.recno.toString()}
-// />
