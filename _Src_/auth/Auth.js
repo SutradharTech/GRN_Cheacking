@@ -16,65 +16,78 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import CustomerStack from '../navigation/CustomerStack';
 import MakerTab from '../navigation/MakerTab';
 import Grn_accept from '../Accept_Grn/Grn_accept';
-import PackerStack from '../navigation/Grn_PackerStack';
+import PackerStack from '../navigation/PackerStack';
 import CheckerStack from '../navigation/CheckerStack';
+import CheckerTab from '../navigation/CheckerTab';
+import PackerTab from '../navigation/PackerTab';
+import DispatcherTab from '../navigation/DispatcherTab';
 
 export const GRN = createContext();
 
+// GRN Accept
 function Accept_Grn({ navigation }) {
   return (
     <Grn_accept />
   )
 }
 
+// GRN Check
 function GRN_Check({ navigation }) {
   return (
     <Grn_CheckingStack />
   );
 }
 
+// GRN Rack
 function Grn_Racking({ navigation }) {
   return (
     <Grn_RackingStack />
   );
 }
 
+// Maker
 function MakerFun({ navigation }) {
   return (
     <MakerTab />
   );
 }
 
+// Checker
 function CheckerFun({ navigation }) {
   return (
-    <CheckerStack />
+    <CheckerTab />
   )
 }
 
+// Packer
 function PackerFun({ navigation }) {
   return (
-    <PackerStack />
+    <PackerTab />
   )
 }
 
+// Dispatcher
 function Dispatcherfun({ navigation }) {
   return (
-    <DispatcherStack />
+    <DispatcherTab />
   )
 }
 
+// Transport
 function Transportfun({ navigation }) {
   return (
     <TransportStack />
   )
 }
 
+// Transport Form X
 function TransportFormfun({ navigation }) {
   return (
     <TransportFormStack />
   )
 }
 
+// Customer X
 function CustomerFun({ navigation }) {
 
   return (
@@ -113,7 +126,7 @@ const Auth = () => {
               ),
             }} />
 
-          {/* Accept GRN */}
+          {/* Check GRN */}
           <Drawer.Screen name="GRN Check" component={GRN_Check}
             options={{
               headerShown: true,
@@ -154,18 +167,32 @@ const Auth = () => {
             }}
           />
 
-          {/*  Checker  */}
+          {/* Checker */}
           <Drawer.Screen name="Checker" component={CheckerFun}
             options={{
+              headerShown: true,
               drawerIcon: ({ focused, size }) => (
                 <MaterialIcons
-                  name="fact-check"
+                  name="emoji-transportation"
                   size={size}
                   color={focused ? '#7cc' : '#ccc'}
                 />
               ),
             }}
           />
+
+           {/* Checker 
+          // <Drawer.Screen name="Checker" component={CheckerFun}
+          //   options={{
+          //     drawerIcon: ({ focused, size }) => (
+          //       <MaterialIcons
+          //         name="fact-check"
+          //         size={size}
+          //         color={focused ? '#7cc' : '#ccc'}
+          //       />
+          //     ),
+          //   }}
+          // /> */}
 
           {/*  Packer  */}
           <Drawer.Screen name="Packer" component={PackerFun}

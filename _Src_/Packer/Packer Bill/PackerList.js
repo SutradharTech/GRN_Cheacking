@@ -1,39 +1,38 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import axios from 'axios';
+import { Checkbox, Divider, TextInput, Button, List } from 'react-native-paper';
 import { Card } from 'react-native-shadow-cards';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { Button, Divider } from 'react-native-paper';
 import AppConstants from '../../AppConstant';
 import CounterBillStatus from '../../CounterBillStatus';
 
-const RevertedList = ({ navigation }) => {
+const PackerList = ({ navigation }) => {
+
 
     useEffect(() => {
-        ApiCall()
+        ApiCall();
     }, [])
 
-    const [filterBillDetails, setfilterBillDetails] = useState([])
-    const [refreshing, setRefreshing] = React.useState(false);
 
-    // Api Call
+    const [filterBillDetais, setfilterBillDetais] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
+
+    // Api Call getcounterbillall
     async function ApiCall() {
 
-        console.log("Api Data // getcounterbillall", "domairecno :", 508, "status :", "P")
+        // setRefreshing(true);
 
-        setRefreshing(true);
-
-        var sendapidata = {
+        var senddataapi = {
             "domainrecno": 508,
-            "status": CounterBillStatus.checkertomaker
+            "status": CounterBillStatus.packer
         }
 
-        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', sendapidata);
-        console.log("ApiRes // getcounterbillall", FilterBillData.data.Message)
-        setfilterBillDetails(FilterBillData.data.Message);
+        const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
+        // console.log("APIRES: /getcounterbillall/",FilterBillData.data.Message)
 
-        setRefreshing(false);
+        setfilterBillDetais(FilterBillData.data.Message)
+
     }
 
     // Formating Function For Date by DDMMYYYY
@@ -49,6 +48,7 @@ const RevertedList = ({ navigation }) => {
         return dt;
     };
 
+    // Formating Time Function
     function showTime(time) {
 
         let n = time;
@@ -58,24 +58,25 @@ const RevertedList = ({ navigation }) => {
         return Time
     }
 
+    // console.log('filterBillDetais----', filterBillDetais)
+
+    // Render Item (function)
     function renderItems({ item, index }) {
-        console.log("item----------------", item)
         return (
             <>
                 <View style={{ flex: 1, margin: "1%", marginVertical: '3%' }}>
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn,From: item.userroledescn ,message: filterBillDetails.message, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ListItem', { custName: item.custdescn, From: item.userroledescn,billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange',  borderRadius: 10,}}>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%',flexWrap: 'wrap' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
                             </View>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Created By :</Text>
-                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.userroledescn}</Text>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>Created By</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', marginLeft: '4%' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />
@@ -86,11 +87,11 @@ const RevertedList = ({ navigation }) => {
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill No :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.billno}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Date :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showDate_ddmmyy(item.trdate)}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Time :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showTime(item.trtime)}</Text>
                                 </View>
@@ -122,19 +123,21 @@ const RevertedList = ({ navigation }) => {
 
     return (
         <View style={{ flex: 1 }}>
+
             <FlatList
-                data={filterBillDetails}
+                data={filterBillDetais}
                 renderItem={renderItems}
                 showsVerticalScrollIndicator={true}
                 // onEndReached={onEndReachedHandler}
-                keyExtractor={(item) => item.recno.toString()}
+                keyExtractor={(item) => item.recno}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={ApiCall} />}
             />
+
         </View>
     )
 }
 
-export default RevertedList
+export default PackerList
 
 const styles = StyleSheet.create({
 
@@ -162,17 +165,8 @@ const styles = StyleSheet.create({
         flex: 0.3,
         alignSelf: 'center',
         // height:'64%',
-        borderRadius: 20,
+        borderRadius: 10,
+        width: '90%',
 
     },
 })
-
-
-
-// <FlatList
-// data={categoryitems}
-// renderItem={renderItems}
-// showsVerticalScrollIndicator={true}
-// onEndReached={onEndReachedHandler}
-// keyExtractor={(item) => item.recno.toString()}
-// />

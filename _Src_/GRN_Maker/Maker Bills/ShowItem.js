@@ -1,31 +1,38 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity,} from 'react-native'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Dialog, Portal, Provider } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Dialog, Portal, Provider, Modal } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppConstants from '../../AppConstant';
+import { v4 as uuidv4 } from "uuid";
 
 
 // console.log("item", route.params.item)
 const ShowItem = ({ route, navigation }) => {
 
-  const [list, setlist] = useState();
+  const [list, setlist] = useState([]);
   const [Salebillfooter, setsalebillfooter] = useState();
   const [flag, setflag] = useState(false);
-  const [SelectedBatch, setSelectedBatch] = useState();
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
+  const [itemBatchList, setitemBatchList] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const [itemRecno, setitemRecno] = useState();
+  const [filterBatch, setfilterBatch] = useState([]);
+  const [itemQty, setitemQty] = useState();
+  const [Pending, setPending] = useState(itemQty);
+  const [Message, setMessage] = useState("");
 
-  const { header: header, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
-  // console.log('i=>', i);
+  const { custName, From, billno, domainrecno, domainuserrecno, ApiCall } = route.params;
 
   useEffect(() => {
     getcounterbill();
+    getbatchno();
   }, [])
 
 
@@ -37,6 +44,13 @@ const ShowItem = ({ route, navigation }) => {
   const hideDialog = () => setdialog(false);
 
 
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+
+  const containerStyle = { backgroundColor: 'white', padding: 20 };
+
+
   var BatchList = [
     { name: 'A1', value: 0 },
     { name: 'B1', value: 1 },
@@ -46,11 +60,10 @@ const ShowItem = ({ route, navigation }) => {
     // { name: 'Shrink', value: 2 },
   ]
 
-
   // Api Call for items according to bill
   async function getcounterbill() {
 
-    console.log("ApiCall // getcounterbill", "billno:", billno, 'maker date:', 36363737, "domainrecno:", domainrecno, "domainuserrecno:", domainuserrecno)
+    console.log("ApiCall // getcounterbill", "billno:", billno, "domainrecno:", domainrecno, "domainuserrecno:", domainuserrecno);
 
     var sendapidata = {
       "domainrecno": domainrecno,
@@ -59,106 +72,58 @@ const ShowItem = ({ route, navigation }) => {
     }
 
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
-    console.log("ApiRes // getcounterbill", UpdateBillData.Message.items)
+    console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
     setlistHeader(UpdateBillData.Message);
+    setlist(UpdateBillData.Message.items);
 
-    if (UpdateBillData.Success == true) {
-      setlist(UpdateBillData.Message.items);
-    }
+    // if (UpdateBillData.Success == true) {
+    // }
 
   }
 
+  console.log("Header---", listHeader)
+
+
+  // Api Call for ItemBatch List
+  async function getbatchno() {
+
+    console.log("ApiCall // getbatchno", "domainrecno:", 508, "itemrecno:", null);
+
+    var sendapidata = {
+      "domainrecno": 508,
+      "itemrecno": null
+
+    }
+
+    const { data: ItemBatchData } = await axios.post(AppConstants.APIurl2 + 'getstockdata/', sendapidata);
+    // console.log("ApiRes // getcounterbill", ItemBatchData.Message)
+
+    setitemBatchList(ItemBatchData.Message);
+
+  }
 
   // Resend Data to previous status 
-  async function resendCounterBill(itm) {
+  async function resendCounterBill() {
 
     let senddataapi = {
-      "items": [
+      ...listHeader,
+      messages: [
         {
-          "recno": itm.recno,
-          "shortguid": itm.shortguid,
-          "itemrecno": itm.itemrecno,
-          "itembatchno": itm.itembatchno,
-          "expdate": itm.expdate,
-          "qty": itm.qty,
-          "rate": itm.rate,
-          "amount": itm.amount,
-          "discountamt": itm.discountamt,
-          "picked": itm.picked,
-          "active": itm.active,
-          "approvalstatus": itm.approvalstatus,
-          "descn": itm.descn,
-          "code": itm.code,
-          "hsn": itm.hsn,
-          "cgstrate": itm.cgstrate,
-          "igstrate": itm.igstrate,
-          "sgstrate": itm.sgstrate,
-          "packtyperecno": itm.packtyperecno,
-          "packtypedescn": itm.packtypedescn,
-          "categoryrecno": itm.categoryrecno,
-          "categorydescn": itm.categorydescn,
-          "uomrecno": itm.uomrecno,
-          "UOM": itm.UOM,
-          "salerate": itm.salerate,
-          "mrp": itm.mrp,
+          msgtouserrecno: 161,
+          userrolerecno: "",
+          msg: "Hello",
+          msgstatus: ""
         }
       ],
-      "image": "",
-      "custDescn": listHeader.custDescn,
-      "creditallowed": listHeader.creditallowed,
-      "shortguid": listHeader.shortguid,
-      "customerdomainrecno": listHeader.customerdomainrecno,
-      "customerrecno": listHeader.customerrecno,
-      "mobile": listHeader.mobile,
-      "trdate": listHeader.trdate,
-      "trtime": listHeader.trtime,
-      "billno": listHeader.billno,
-      "lockedby": listHeader.lockedby,
-      "lockedby": listHeader.lockedby,
-      "status": "O",
-      "message": listHeader.message,
-      "makerdate": listHeader.makerdate,
-      "makertime": listHeader.makertime,
-      "checkerdate": listHeader.checkerdate,
-      "checkertime": listHeader.checkertime,
-      "packerdate": listHeader.packerdate,
-      "packertime": listHeader.packertime,
-      "dispatchdate": listHeader.dispatchdate,
-      "dispatchtime": listHeader.dispatchtime,
-      "transportpickup": listHeader.transportpickup,
-      "transportdate": listHeader.transportdate,
-      "transporttime": listHeader.transporttime,
-      "receiverdate": listHeader.receiverdate,
-      "receivertime": listHeader.receivertime,
-      "boxes": listHeader.boxes,
-      "active": listHeader.active,
-      "amount": listHeader.amount,
-      "discountamt": listHeader.discountamt,
-      "logo": listHeader.logo,
-      "cashamt": listHeader.cashamt,
-      "cardamt": listHeader.cardamt,
-      "walletamt": listHeader.walletamt,
-      "pointsamt": listHeader.pointsamt,
-      "creditamt": listHeader.creditamt,
-      "salereturnamt": listHeader.salereturnamt,
-      "cardrefid": listHeader.cardrefid,
-      "walletrefid": listHeader.walletrefid,
-      "cgstamt": listHeader.cgstamt,
-      "sgstamt": listHeader.sgstamt,
-      "igstamt": listHeader.igstamt,
-      "roundamt": listHeader.roundamt,
-      "spotdiscountamt": listHeader.spotdiscountamt,
-      "tokenno": listHeader.tokenno,
-      "domainposrecno": listHeader.domainposrecno,
-      "domainrecno": listHeader.domainrecno,
-      "domainuserrecno": listHeader.domainuserrecno
+      status: "R",
+
     }
 
     console.log('Resenddataapi----', senddataapi);
 
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-    console.log("ApiRes // getcounterbill", UpdateBillData)
+    console.log("ApiRes // addcounterbill", UpdateBillData)
 
     if (UpdateBillData.Success == true) {
       ApiCall();
@@ -169,99 +134,28 @@ const ShowItem = ({ route, navigation }) => {
 
 
   // Post Api Call (Send to next page) 
-  async function addcounterbill(itm) {
+  async function addcounterbill() {
 
+    console.log("Api Call / addcounterbill /", "listHeader:", listHeader, "makerDate:", AppFunction.getToday().dataDate, "makerTime:", AppFunction.getTime().dataTime, "status:", 'C');
     let senddataapi = {
-      "items": [
-        {
-          "recno": itm.recno,
-          "shortguid": itm.shortguid,
-          "itemrecno": itm.itemrecno,
-          "itembatchno": itm.itembatchno,
-          "expdate": itm.expdate,
-          "qty": itm.qty,
-          "rate": itm.rate,
-          "amount": itm.amount,
-          "discountamt": itm.discountamt,
-          "picked": !itm.picked,
-          "active": itm.active,
-          "approvalstatus": itm.approvalstatus,
-          "descn": itm.descn,
-          "code": itm.code,
-          "hsn": itm.hsn,
-          "cgstrate": itm.cgstrate,
-          "igstrate": itm.igstrate,
-          "sgstrate": itm.sgstrate,
-          "packtyperecno": itm.packtyperecno,
-          "packtypedescn": itm.packtypedescn,
-          "categoryrecno": itm.categoryrecno,
-          "categorydescn": itm.categorydescn,
-          "uomrecno": itm.uomrecno,
-          "UOM": itm.UOM,
-          "salerate": itm.salerate,
-          "mrp": itm.mrp,
-        }
-      ],
-      "image": "",
-      "custDescn": listHeader.custDescn,
-      "creditallowed": listHeader.creditallowed,
-      "shortguid": listHeader.shortguid,
-      "customerdomainrecno": listHeader.customerdomainrecno,
-      "customerrecno": listHeader.customerrecno,
-      "mobile": listHeader.mobile,
-      "trdate": listHeader.trdate,
-      "trtime": listHeader.trtime,
-      "billno": listHeader.billno,
-      "lockedby": listHeader.lockedby,
-      "lockedby": listHeader.lockedby,
-      "status": "C",
-      "message": listHeader.message,
-      "makerdate": AppFunction.getToday().dataDate,
-      "makertime": AppFunction.getTime().dataTime,
-      "checkerdate": listHeader.checkerdate,
-      "checkertime": listHeader.checkertime,
-      "packerdate": listHeader.packerdate,
-      "packertime": listHeader.packertime,
-      "dispatchdate": listHeader.dispatchdate,
-      "dispatchtime": listHeader.dispatchtime,
-      "transportpickup": listHeader.transportpickup,
-      "transportdate": listHeader.transportdate,
-      "transporttime": listHeader.transporttime,
-      "receiverdate": listHeader.receiverdate,
-      "receivertime": listHeader.receivertime,
-      "boxes": listHeader.boxes,
-      "active": listHeader.active,
-      "amount": listHeader.amount,
-      "discountamt": listHeader.discountamt,
-      "logo": listHeader.logo,
-      "cashamt": listHeader.cashamt,
-      "cardamt": listHeader.cardamt,
-      "walletamt": listHeader.walletamt,
-      "pointsamt": listHeader.pointsamt,
-      "creditamt": listHeader.creditamt,
-      "salereturnamt": listHeader.salereturnamt,
-      "cardrefid": listHeader.cardrefid,
-      "walletrefid": listHeader.walletrefid,
-      "cgstamt": listHeader.cgstamt,
-      "sgstamt": listHeader.sgstamt,
-      "igstamt": listHeader.igstamt,
-      "roundamt": listHeader.roundamt,
-      "spotdiscountamt": listHeader.spotdiscountamt,
-      "tokenno": listHeader.tokenno,
-      "domainposrecno": listHeader.domainposrecno,
-      "domainrecno": listHeader.domainrecno,
-      "domainuserrecno": listHeader.domainuserrecno
+      ...listHeader,
+      items: list,
+      messages: [],
+      status: "Ch",
+      makerdate: AppFunction.getToday().dataDate,
+      makertime: AppFunction.getTime().dataTime
     }
 
-    console.log('senddataapi----', senddataapi);
+    console.log('senddataapi aDD----', senddataapi);
 
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-    console.log("ApiRes // getcounterbill", UpdateBillData)
+    console.log("ApiRes // addcounterbill", UpdateBillData)
 
     if (UpdateBillData.Success == true) {
       ApiCall();
       navigation.navigate('Maker');
     }
+    // console.log("sumQty---", sumQty)
 
   }
 
@@ -311,6 +205,49 @@ const ShowItem = ({ route, navigation }) => {
     // setsalebillfooter(FooterBillData.data);
   }
 
+  console.log("list--->", list)
+
+  // Send To Api Batch
+  function sendBatchCondition() {
+    let sendBatch = filterBatch.filter(b => b.qty != 0);
+
+    console.log('sendBatch', sendBatch);
+
+    sendBatch.map(item => {
+      var newdata = list.filter(
+        itm =>
+          itm.itembatchno == item.itembatchno &&
+          itm.itemrecno == item.itemrecno,
+      );
+
+      console.log("newdata", newdata)
+
+      if (newdata.length > 0) {
+        setlist(p => {
+          var updatebatch = p;
+
+          var index = updatebatch.indexOf(newdata[0]);
+
+          updatebatch[index].qty = item.qty;
+
+          return [...updatebatch];
+        });
+      } else {
+        setlist(p => {
+          return [...p, { ...item, shortguid: uuidv4() }];
+        });
+      }
+    });
+
+    setVisible((p) => !p)
+  }
+
+  const Total = filterBatch.reduce((prev, curr) => Number(prev) + Number(curr.qty), 0)
+
+  let pending = itemQty - Total
+
+  console.log("Total", Total)
+
 
   // Function to check all checkbox is true  
   function SubmitCondition() {
@@ -321,10 +258,10 @@ const ShowItem = ({ route, navigation }) => {
     }
     console.log("Check------>", result.length)
     if (result.length == 0) {
-      list.map((itm) => {
-        console.log('itm=======', itm);
-        addcounterbill(itm);
-      })
+      // list.map((itm) => {
+      //   console.log('itm=======', itm);
+      // })
+      addcounterbill();
     }
     else {
       alert('Please Check All box')
@@ -353,9 +290,8 @@ const ShowItem = ({ route, navigation }) => {
     let year = d.slice(3, 7);
     let month = d.slice(0, 2);
 
-    var dataDate = year + month
+    return year + month
 
-    // console.log("dataDate---------",dataDate);
   }
 
 
@@ -363,9 +299,18 @@ const ShowItem = ({ route, navigation }) => {
   const ListHeader = () => {
     //View to set in Header
     return (
-      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-        <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-        <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 18, marginRight: '35%' }}>{listHeader?.custDescn}</Text>
+      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', }}>
+
+        <View style={{ flexDirection: 'row', flex: 0.9, justifyContent: 'center', marginLeft: '2%', alignItems: 'center' }}>
+          <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 12, marginRight: '35%' }}>{custName}</Text>
+        </View>
+
+        <View style={{ flex: 0.4, alignItems: 'center' }}>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 12, marginRight: '35%' }}>Created By</Text>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 12, marginRight: '35%' }}>{From}</Text>
+        </View>
+
       </Card>
     );
   };
@@ -373,8 +318,30 @@ const ShowItem = ({ route, navigation }) => {
 
   // render Function
   function renderItems({ item, index }) {
+
+    function filterBatchfun(recno, qty) {
+
+      let result = itemBatchList.filter(batch => batch.itemrecno == recno)
+
+      console.log("result ---->", result);
+
+      let res = result.map((i, index) => {
+
+        return { ...i, qty: 0 }
+      })
+
+      setitemQty(qty);
+      setfilterBatch(res);
+    }
+
+    console.log("filter Batch----", filterBatch);
+
+    console.log("Qty, free", item.qty , item.free)
+
+
     return (
       <>
+
         <View style={{ flex: 1, margin: "1%", marginHorizontal: '3%' }}>
 
           <Card style={styles.Body_Main_Card}>
@@ -384,18 +351,12 @@ const ShowItem = ({ route, navigation }) => {
               {/* Item Name */}
 
               <View style={{ ...styles.card_subViews, flex: 1.7, }}>
-                <Text style={styles.Heder_Text} >{item.descn}</Text>
+                <Text style={styles.Heder_Text} >{item.descn || item.itemname}</Text>
               </View>
 
               {/* Checkbox View */}
 
-              <View style={{ flex: 0.9, justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 12, flexDirection: 'row' }}>
-
-                <View>
-                  {
-                    item.picked == false ? (<><Text style={{ fontWeight: '700', fontSize: 15, }}>Pick-up</Text></>) : (<><Text style={{ fontSize: 15, fontWeight: '700', color: 'dodgerblue' }}>Discard</Text></>)
-                  }
-                </View>
+              <View style={{ flex: 0.2, justifyContent: 'space-evenly', alignItems: 'center', borderRadius: 12, flexDirection: 'row' }}>
 
                 <View>
                   <Checkbox
@@ -428,7 +389,7 @@ const ShowItem = ({ route, navigation }) => {
 
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
 
-                {/*  Qty and Amount */}
+                {/*  Qty and MRP */}
                 <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%' }}>
 
                   <View>
@@ -437,7 +398,7 @@ const ShowItem = ({ route, navigation }) => {
                   <View>
                     {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
                     <TextInput
-                      placeholder={item.qty.toString()}
+                      placeholder={(item?.qty + item?.free ).toString()}
                       style={{ height: 30, width: 60 }}
                       onChangeText={(text) => {
                         setlist((p) => {
@@ -451,55 +412,26 @@ const ShowItem = ({ route, navigation }) => {
                     />
                   </View>
 
-
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginVertical: '2%' }}>
-
-                    <View>
-                      <Text style={{ fontWeight: '400' }}>Amount : </Text>
-                    </View>
-
-                    <View>
-                      {/* <Text style={{ fontWeight: '600' }}>Rs. {item.amount}</Text> */}
-                      <TextInput
-                        style={{ fontWeight: '600', height: 40 }}
-                        defaultValue={item.amount.toString()}
-                        onChangeText={(text) => {
-                          setlist((p) => {
-                            p[index].amount = text;
-                            return [...p]
-                          })
-                          console.log('p---------->', list)
-                        }}
-                      />
-                    </View>
-                  </View>
                 </View>
 
                 {/*  Expiry Date and MRP  */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
 
+
+
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
 
+                    {/* Expiry Date */}
                     <View>
                       <Text style={{ fontWeight: '400' }}>Expiry Date</Text>
                     </View>
                     <View>
 
-                      <TextInput
-                        style={{ fontWeight: '600', height: 30 }}
-                        defaultValue={showDate_ddmmyy(item.expdate)}
-                        onChangeText={(text) => {
-                          let dt = text;
-                          setlist((p) => {
-                            let formatdate = formatDate(dt);
-                            p[index].expdate = formatdate;
-                            return [...p]
-                          })
-                          console.log('Format Exp Date---------->', list)
-                        }}
-                      />
+                      <Text>{showDate_ddmmyy(item.expdate)}</Text>
+
                     </View>
 
+                    {/* MRP */}
                     <View>
                       <Text style={{ fontWeight: '600' }}>MRP</Text>
                     </View>
@@ -516,9 +448,26 @@ const ShowItem = ({ route, navigation }) => {
             </View>
 
             {/*  Box Atributes  */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '60%', marginTop: '5%', }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', marginTop: '5%', }}>
               <Text>Box</Text>
-              <Text style={{ fontSize: 17 }}> {item?.outerbox}  X  {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <Text style={{ fontSize: 17 }}> {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <View>
+                <Checkbox
+
+                  color={'orange'}
+                  // key={item.key}
+                  status={list[index].attributeschecked ? 'checked' : 'unchecked'}
+                  onPress={(n) => {
+                    // console.log('n==>', n)
+                    setlist((p) => {
+                      p[index].attributeschecked = !p[index].attributeschecked;
+
+                      return [...p]
+                    })
+
+                  }}
+                />
+              </View>
             </View>
 
             {/*  Batch No  */}
@@ -529,50 +478,17 @@ const ShowItem = ({ route, navigation }) => {
               </View>
 
               <View>
-                <TextInput
-                  style={{ fontWeight: '600', height: 40 }}
-                  defaultValue={item.itembatchno}
-                  onChangeText={(text) => {
-                    setlist((p) => {
-                      p[index].itembatchno = text;
-                      return [...p]
-                    })
-                    console.log('p---------->', list)
-                  }}
-                />
+                <Text style={{ fontWeight: '400' }}>{item.itembatchno}</Text>
               </View>
 
-              {/* Dropdown for batch seleection */}
-              {/* <Picker
-                selectedValue={SelectedBatch}
-                style={{ width: '40%' }}
-                onValueChange={(BatchValue) => {
-
-                  setSelectedBatch(BatchValue.name) */}
-              {/* // console.log('------>',SelectedWarehouse.value)
-                  // setApiData(p => {
-                  //     var newdata = p
-                  //     newdata[index].Warehouse = itemValue
-                  //     console.log("newdata", newdata)
-
-                  //     return [...newdata]
-                  // })
-                }
-                }
-              // mode='dropdown' 
-              > */}
-              {/* <Picker.Item label={"select"} />
-
-                {
-                  BatchList.map(batch => {
-
-                    return (
-                      <Picker.Item label={batch.name} value={batch} />
-                    )
-                  })
-                }
-
-              </Picker> */}
+              <TouchableOpacity>
+                <Button
+                  style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                  onPress={() => { filterBatchfun(item.itemrecno, item.qty), showModal() }}
+                >
+                  <Text style={{ color: 'orange' }}>Add Batch</Text>
+                </Button>
+              </TouchableOpacity>
 
             </View>
 
@@ -605,84 +521,186 @@ const ShowItem = ({ route, navigation }) => {
 
   return (
     <Provider>
-      <View style={{ flex: 1 }}>
 
-        <FlatList
-          // data={BillDetails}
-          data={list}
-          renderItem={renderItems}
-          showsVerticalScrollIndicator={true}
-          // onEndReached={onEndReachedHandler}
-          keyExtractor={(item) => item.recno.toString()}
-          ListHeaderComponent={ListHeader}
+      <Portal>
 
-        />
+        <View style={{ flex: 1 }}>
 
-        {/* Submit And Revert button */}
+          <FlatList
+            // data={BillDetails}
+            data={list}
+            renderItem={renderItems}
+            showsVerticalScrollIndicator={true}
+            // onEndReached={onEndReachedHandler}
+            keyExtractor={(item) => item.recno.toString()}
+            ListHeaderComponent={ListHeader}
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'ghostwhite', paddingVertical: '1%' }}>
+          />
 
-          {/*  Revert Bill  */}
-          <TouchableOpacity>
-            <Button
-              style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
-              onPress={() => setdialog(true)}
-            >
-              <Text style={{ color: 'orange' }}>Revert</Text>
-            </Button>
-          </TouchableOpacity>
+          {/* Submit And Revert button */}
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'ghostwhite', paddingVertical: '1%' }}>
+
+            {/*  Revert Bill  */}
+            <TouchableOpacity>
+              <Button
+                style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                onPress={() => setdialog(true)}
+              >
+                <Text style={{ color: 'orange' }}>Revert</Text>
+              </Button>
+            </TouchableOpacity>
 
 
-          {/*  Submit Bill  */}
-          <TouchableOpacity>
-            <Button
-              style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
-              onPress={SubmitCondition}
-            >
-              <Text style={{ color: 'white' }}>Submit</Text>
-            </Button>
-          </TouchableOpacity>
+            {/*  Submit Bill  */}
+            <TouchableOpacity>
+              <Button
+                style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+                onPress={SubmitCondition}
+              >
+                <Text style={{ color: 'white' }}>Submit</Text>
+              </Button>
+            </TouchableOpacity>
+
+          </View>
+
+          {
+            dialog ? (
+              <Portal>
+                <Dialog visible={showDialog} onDismiss={hideDialog} style={{ height: '40%', justifyContent: 'space-between' }}>
+
+                  <View>
+
+                    <Dialog.Title>Message</Dialog.Title>
+
+                    <TextInput
+                      style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
+                      // multiline={true}
+                      onChangeText={(text) => {
+
+                        setMessage(text);
+                        // listHeader.messages.msg = text,
+
+
+                        console.log('listHeader---------->', listHeader)
+                      }}
+                    />
+
+                  </View>
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <Button onPress={() => {
+                      // list.map((itm) => {
+                      //   console.log('itm=======', itm);
+                      // })
+                      resendCounterBill();
+                    }} >Resend</Button>
+
+                    <Button onPress={hideDialog}>Exit</Button>
+                  </View>
+
+                </Dialog>
+              </Portal>
+            ) : null
+          }
+
+
+          <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle} style={{ height: "75%" }}>
+            <ScrollView>
+              <View style={{ flex: 1 }}>
+
+                <View style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                    {`Batch:  `}
+                  </Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                    Exp Date:
+                  </Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                    stock:
+                  </Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                    {`Quantity:  `}
+                  </Text>
+                </View>
+
+                {
+                  filterBatch.map((batch, index) => {
+
+                    return (
+                      <View key={batch.itembatchno} style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
+                        <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                          {batch.itembatchno}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                          {batch.expdate}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                          {batch.totalstock}
+                        </Text>
+                        <TextInput
+                          style={styles.searchInput}
+                          placeholder={'Qty'}
+                          keyboardType='numeric'
+                          onChangeText={(text) => {
+                            setfilterBatch((p) => {
+                              p[index].qty = text;
+
+                              return [...p];
+
+                            })
+                          }}
+
+                        // onChangeText={textChangeHandler}
+                        />
+
+
+
+                      </View>
+                    )
+                  })
+                }
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Pending</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{pending}</Text>
+                  </View>
+
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Projected</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{itemQty}</Text>
+                  </View>
+
+                  {/*  Submit Bill  */}
+                  <TouchableOpacity>
+                    {
+                      pending == 0 ?
+                        <>
+                          <Button
+                            style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+                            onPress={sendBatchCondition}
+                          >
+                            <Text style={{ color: 'white' }}>Submit</Text>
+                          </Button>
+                        </>
+                        :
+                        (null)
+                    }
+
+                  </TouchableOpacity>
+                </View>
+
+              </View>
+            </ScrollView>
+          </Modal>
+
 
         </View>
 
-        {
-          dialog ? (
-            <Portal>
-              <Dialog visible={showDialog} onDismiss={hideDialog} style={{ height: '40%', justifyContent: 'space-between' }}>
-                
-                <View>
+      </Portal>
 
-                  <Dialog.Title>Message</Dialog.Title>
-
-                  <TextInput
-                    style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
-                    // multiline={true}
-                    onChangeText={(text) => {
-                      listHeader.message = text
-
-                      console.log('listHeader---------->', listHeader)
-                    }}
-                  />
-
-                </View>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                  <Button onPress={() => {
-                    list.map((itm) => {
-                      console.log('itm=======', itm);
-                      resendCounterBill(itm);
-                    })
-                  }} >Resend</Button>
-
-                  <Button onPress={hideDialog}>Exit</Button>
-                </View>
-
-              </Dialog>
-            </Portal>
-          ) : null
-        }
-
-      </View>
     </Provider>
   )
 }
@@ -722,5 +740,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: 7,
   },
+  searchInput: {
+    borderWidth: 0,
+    width: '25%',
+    color: 'black',
+    height: 30
+  }
 
 })

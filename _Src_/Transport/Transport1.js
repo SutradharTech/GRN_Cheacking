@@ -67,24 +67,6 @@ const Transport1 = ({ navigation }) => {
     // console.log('filterBillDetais----', filterBillDetais)
 
 
-    // Function to check all checkbox is true  
-    function patchData() {
-        const result = filterBillDetais.filter(Check);
-
-        function Check(item) {
-            return item.isChecked == true;
-        }
-        // console.log("Check------>", result.length)
-        if (result.length > 0) {
-            addcounterbill(result);
-            // alert('Success');
-        }
-        else {
-            alert('Please Select Min one Bill')
-        }
-    }
-
-
     // Render Item (function)
     function renderItems({ item, index }) {
         return (
@@ -112,7 +94,7 @@ const Transport1 = ({ navigation }) => {
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Date :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showDate_ddmmyy(item.trdate)}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Time :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showTime(item.trtime)}</Text>
                                 </View>
