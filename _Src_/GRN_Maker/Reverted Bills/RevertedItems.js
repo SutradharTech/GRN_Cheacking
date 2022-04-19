@@ -347,68 +347,87 @@ const RevertedItems = ({ route, navigation }) => {
 
             {/* Item Details */}
 
-            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', height: 50 }}>
 
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
+              <View style={{ alignItems: 'center', flexDirection: 'row', width: '60%', justifyContent: 'space-around', marginVertical: '4%' }}>
 
-                {/*  Qty and Amount */}
-                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%' }}>
+                <Text style={{ fontSize: 15, fontWeight: '500' }}>marketeer</Text>
+                <Text>{item.marketeerdescn}</Text>
 
-                  <View>
-                    <Text style={{ fontWeight: '400' }}>Quntity : </Text>
-                  </View>
-                  <View>
-                    {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
-                    <TextInput
-                      placeholder={(item?.qty + item?.free ).toString()}
-                      style={{ height: 30, width: 60 }}
-                      disabled={item.checked == 1 ? true : false}
-                      onChangeText={(text) => {
-                        setlist((p) => {
-                          p[index].qty = text;
-                          return [...p]
-                        })
-                        console.log('p---------->', list)
-                      }}
-                      keyboardType='number-pad'
+              </View>
 
-                    />
-                  </View>
+              <View style={{ alignItems: 'center', flexDirection: 'row', width: '40%', justifyContent: 'space-around', marginVertical: '4%' }}>
+
+                <Text style={{ fontSize: 15, fontWeight: '500' }}>Unit</Text>
+
+                <Text>{item.unit}</Text>
+
+              </View>
+            </View>
+
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70, }}>
+
+                {/*  Qty */}
+                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%', flex: 1 }}>
+
+                  <Text style={{ fontWeight: '400' }}>Quntity : </Text>
+
+                  {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
+                  <TextInput
+                    placeholder={(item?.qty + item?.free).toString()}
+                    style={{ height: 30, width: 60 }}
+                    disabled={item.checked == 1 ? true : false}
+                    onChangeText={(text) => {
+                      setlist((p) => {
+                        p[index].qty = text;
+                        return [...p]
+                      })
+                      console.log('p---------->', list)
+                    }}
+                    keyboardType='number-pad'
+
+                  />
+
 
                 </View>
 
-                {/*  Expiry Date and MRP  */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
+                <View style={{ alignItems: 'center', flexDirection: 'column', width: '50%', justifyContent: 'space-around', marginVertical: '4%', flexWrap: 'nowrap', flex: 1.5 }}>
 
+                  <Text style={{ fontSize: 15, fontWeight: '500' }}>manufacturer</Text>
+                  <Text>{item.manufacturerdescn}</Text>
 
+                </View>
 
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
+            </View>
 
-                    {/* Expiry Date */}
-                    <View>
-                      <Text style={{ fontWeight: '400' }}>Expiry Date</Text>
-                    </View>
-                    <View>
+            {/*  Expiry Date and MRP  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
 
-                      <Text>{showDate_ddmmyy(item.expdate)}</Text>
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
 
-                    </View>
+                {/* Expiry Date */}
+                <View>
+                  <Text style={{ fontWeight: '400' }}>Expiry Date</Text>
+                </View>
+                <View>
 
-                    {/* MRP */}
-                    <View>
-                      <Text style={{ fontWeight: '600' }}>MRP</Text>
-                    </View>
-                    <View>
-                      <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
-                    </View>
+                  <Text>{showDate_ddmmyy(item.expdate)}</Text>
 
-                  </View>
+                </View>
 
+                {/* MRP */}
+                <View>
+                  <Text style={{ fontWeight: '600' }}>MRP</Text>
+                </View>
+                <View>
+                  <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
                 </View>
 
               </View>
 
             </View>
+
+
 
             {/*  Box Atributes  */}
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', marginTop: '5%', }}>
@@ -437,13 +456,9 @@ const RevertedItems = ({ route, navigation }) => {
             {/*  Batch No  */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', marginVertical: '2%' }}>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Batch No : </Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Batch No : </Text>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>{item.itembatchno}</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>{item.itembatchno}</Text>
 
               {
                 item.checked == 1 ? (null) : (
@@ -464,21 +479,15 @@ const RevertedItems = ({ route, navigation }) => {
             {/*  Location name and code  */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginVertical: '2%' }}>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Location :</Text>
-              </View>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>{item.location}</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Location :</Text>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Location code :</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>{item.location}</Text>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>{item.locationcode}</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Location code :</Text>
+
+              <Text style={{ fontWeight: '400' }}>{item.locationcode}</Text>
+
 
             </View>
 

@@ -26,6 +26,11 @@ const ListItem = ({ route, navigation }) => {
   const [visible, setVisible] = React.useState(false);
   const [Indicator, setIndicator] = useState(false);
   const [imageIndex, setimageIndex] = useState();
+  const [noBox, setnoBox] = useState(0);
+  const [noBag, setnoBag] = useState(0);
+  const [noSaline, setnoSaline] = useState(0);
+  const [noJar, setnoJar] = useState(0);
+
 
 
   const showDialog = () => setVisible(true);
@@ -116,6 +121,12 @@ const ListItem = ({ route, navigation }) => {
     }
   }
 
+
+  const totalImage = Number(noBox) + Number(noBag) + Number(noSaline) + Number(noJar);
+
+  console.log("totalImage", totalImage);
+
+
   // Taking Photo (function)
   const takePhoto = () => {
 
@@ -126,14 +137,17 @@ const ListItem = ({ route, navigation }) => {
       cropping: true,
       includeBase64: true
     }).then(img => {
-      console.log('image=====', img);
+      // console.log('image=====', img);
 
       setPostImage((p) => {
 
         return [...p, img.data]
       })
 
+      count = count + 1;
+
     });
+
   };
 
 
@@ -144,9 +158,6 @@ const ListItem = ({ route, navigation }) => {
     setPostImage(newTodos);
     console.log("NewItem", newTodos);
   }
-
-
-
 
   return (
     <Provider>
@@ -195,6 +206,7 @@ const ListItem = ({ route, navigation }) => {
                   style={{ width: '40%', height: 35 }}
                   keyboardType="numeric"
                   onChangeText={(text) => {
+                    setnoBox(text);
                     listHeader.boxes = text
 
                     // console.log('listHeader', listHeader)
@@ -209,6 +221,7 @@ const ListItem = ({ route, navigation }) => {
                   style={{ width: '40%', height: 35 }}
                   keyboardType="numeric"
                   onChangeText={(text) => {
+                    setnoBag(text);
                     listHeader.noofbags = text
 
                     console.log('listHeader', listHeader)
@@ -226,6 +239,7 @@ const ListItem = ({ route, navigation }) => {
                   style={{ width: '35%', height: 35 }}
                   keyboardType="numeric"
                   onChangeText={(text) => {
+                    setnoSaline(text)
                     listHeader.noofsaline = text
 
                     // console.log('listHeader', listHeader)
@@ -240,6 +254,7 @@ const ListItem = ({ route, navigation }) => {
                   style={{ width: '40%', height: 35 }}
                   keyboardType="numeric"
                   onChangeText={(text) => {
+                    setnoJar(text)
                     listHeader.noofjar = text
 
                     // console.log('listHeader', listHeader)

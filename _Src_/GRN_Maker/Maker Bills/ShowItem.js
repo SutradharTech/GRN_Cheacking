@@ -334,9 +334,11 @@ const ShowItem = ({ route, navigation }) => {
       setfilterBatch(res);
     }
 
-    console.log("filter Batch----", filterBatch);
+    // console.log("filter Batch----", filterBatch);
 
-    console.log("Qty, free", item.qty , item.free)
+    let totalQty = item?.qty + item?.free;
+
+    // console.log("Qty, free", item.qty, item.free)
 
 
     return (
@@ -346,7 +348,7 @@ const ShowItem = ({ route, navigation }) => {
 
           <Card style={styles.Body_Main_Card}>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
 
               {/* Item Name */}
 
@@ -389,35 +391,67 @@ const ShowItem = ({ route, navigation }) => {
 
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
 
-                {/*  Qty and MRP */}
-                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%' }}>
+                {/* marketeer and unit */}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', height: 50 }}>
 
-                  <View>
-                    <Text style={{ fontWeight: '400' }}>Quntity : </Text>
+                  <View style={{ alignItems: 'center', flexDirection: 'row', width: '60%', justifyContent: 'space-around', marginVertical: '4%' }}>
+
+                    <Text style={{ fontSize: 15, fontWeight: '500' }}>marketeer</Text>
+                    <Text>{item.marketeerdescn}</Text>
+
                   </View>
-                  <View>
+
+                  <View style={{ alignItems: 'center', flexDirection: 'row', width: '40%', justifyContent: 'space-around', marginVertical: '4%' }}>
+
+                    <Text style={{ fontSize: 15, fontWeight: '500' }}>Unit</Text>
+
+                    <Text>{item.unit}</Text>
+
+                  </View>
+                </View>
+
+                {/*  Qty and manufacturer */}
+                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '4%' }}>
+
+                  <View style={{ alignItems: 'center', flexDirection: 'row', width: '50%', justifyContent: 'space-around', marginVertical: '4%' }}>
+
+                    <Text style={{ fontWeight: '400' }}>Quntity : </Text>
+
                     {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
                     <TextInput
-                      placeholder={(item?.qty + item?.free ).toString()}
-                      style={{ height: 30, width: 60 }}
+                      placeholder={totalQty.toString()}
+                      style={{ height: 30, width: 50 }}
                       onChangeText={(text) => {
-                        setlist((p) => {
-                          p[index].qty = text;
-                          return [...p]
-                        })
+
+                        if (totalQty >= text) {
+
+                          setlist((p) => {
+                            p[index].qty = text;
+                            return [...p]
+                          })
+                        }
+                        else {
+                          alert("You Cannot add more qty !!")
+                        }
                         console.log('p---------->', list)
                       }}
                       keyboardType='number-pad'
 
                     />
+
+                  </View>
+
+                  <View style={{ alignItems: 'center', flexDirection: 'row', width: '50%', justifyContent: 'space-around', marginVertical: '4%', flexWrap: 'wrap' }}>
+
+                    <Text style={{ fontSize: 15, fontWeight: '500' }}>manufacturer</Text>
+                    <Text>{item.manufacturerdescn}</Text>
+
                   </View>
 
                 </View>
 
                 {/*  Expiry Date and MRP  */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
-
-
 
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
 
@@ -473,13 +507,9 @@ const ShowItem = ({ route, navigation }) => {
             {/*  Batch No  */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', marginVertical: '2%' }}>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Batch No : </Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Batch No : </Text>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>{item.itembatchno}</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>{item.itembatchno}</Text>
 
               <TouchableOpacity>
                 <Button
@@ -590,9 +620,6 @@ const ShowItem = ({ route, navigation }) => {
 
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <Button onPress={() => {
-                      // list.map((itm) => {
-                      //   console.log('itm=======', itm);
-                      // })
                       resendCounterBill();
                     }} >Resend</Button>
 

@@ -196,12 +196,12 @@ const ResendItems = ({ route, navigation }) => {
     return (
       <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
 
-        <View style={{flexDirection: 'row', flex: 0.9}}>
+        <View style={{ flexDirection: 'row', flex: 0.9 }}>
           <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '15%', }}>{CustName}</Text>
         </View>
 
-        <View style={{flex: 0.4, alignItems: 'center'}}>
+        <View style={{ flex: 0.4, alignItems: 'center' }}>
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '10%', }}>Created By</Text>
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '10%', }}>{From}</Text>
         </View>
@@ -256,6 +256,50 @@ const ResendItems = ({ route, navigation }) => {
 
 
             {/* Item Details */}
+
+            {/* Manufacturer and unit */}
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row' }}>
+
+              <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+
+                <Text style={{ fontWeight: '400' }}>manufacturer</Text>
+
+                <Text style={{ fontWeight: '800' }}>{item?.manufacturerdescn}</Text>
+
+              </View>
+
+              <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly', }}>
+
+                <Text style={{ fontWeight: '400' }}>Unit</Text>
+
+                <Text style={{ fontWeight: '700' }}>{item.unit} </Text>
+
+              </View>
+
+            </View>
+
+            {/* Marketeer and mrp */}
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row' }}>
+
+              <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+
+                <Text style={{ fontWeight: '400' }}>marketeer</Text>
+
+                <Text style={{ fontWeight: '800' }}>{item?.marketeerdescn}</Text>
+
+              </View>
+
+              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', flexWrap: 'wrap' }}>
+
+                <Text style={{ fontWeight: '400' }}>MRP : </Text>
+
+                <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
+
+              </View>
+
+            </View>
+
+
 
             {/* Quantity And Expiry Date */}
             <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%' }}>

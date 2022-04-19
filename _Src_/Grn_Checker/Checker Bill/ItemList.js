@@ -312,6 +312,49 @@ const ItemList = ({ route, navigation }) => {
 
             {/* Item Details */}
 
+            {/* Manufacturer and unit */}
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row' }}>
+
+              <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+
+                <Text style={{ fontWeight: '400' }}>manufacturer</Text>
+
+                <Text style={{ fontWeight: '800' }}>{item?.manufacturerdescn}</Text>
+
+              </View>
+
+              <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly', }}>
+
+                <Text style={{ fontWeight: '400' }}>Unit</Text>
+
+                <Text style={{ fontWeight: '700' }}>{item.unit} </Text>
+
+              </View>
+
+            </View>
+
+            {/* Marketeer and MRP */}
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row' }}>
+
+              <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
+
+                <Text style={{ fontWeight: '400' }}>marketeer</Text>
+
+                <Text style={{ fontWeight: '800' }}>{item?.marketeerdescn}</Text>
+
+              </View>
+
+              <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', flexWrap: 'wrap' }}>
+
+                <Text style={{ fontWeight: '400' }}>MRP : </Text>
+
+                <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
+
+              </View>
+
+            </View>
+
+
             {/* Quantity And Expiry Date */}
             <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%' }}>
 
@@ -319,45 +362,18 @@ const ItemList = ({ route, navigation }) => {
 
                 <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', }}>
 
-                  <View>
-                    <Text style={{ fontWeight: '400' }}>Quntity : </Text>
-                  </View>
-                  <View>
-                    <Text style={{ fontWeight: '800' }}>{item?.qty + item?.free}</Text>
-                  </View>
+                  <Text style={{ fontWeight: '400' }}>Quntity : </Text>
+
+                  <Text style={{ fontWeight: '800' }}>{item?.qty + item?.free}</Text>
+
 
                 </View>
 
                 <View style={{ flex: 1.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly', }}>
 
-                  <View>
-                    <Text style={{ fontWeight: '400' }}>Expiry Date:</Text>
-                  </View>
-                  <View>
-                    <Text style={{ fontWeight: '700' }}>{showDate_ddmmyy(item.expdate)} </Text>
-                  </View>
+                  <Text style={{ fontWeight: '400' }}>Expiry Date:</Text>
 
-                </View>
-
-              </View>
-
-            </View>
-
-            {/* Amount And MRP */}
-            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%' }}>
-
-              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', }}>
-
-      
-                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', flexWrap: 'wrap' }}>
-
-                  <View>
-                    <Text style={{ fontWeight: '400' }}>MRP : </Text>
-                  </View>
-
-                  <View>
-                    <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
-                  </View>
+                  <Text style={{ fontWeight: '700' }}>{showDate_ddmmyy(item.expdate)} </Text>
 
                 </View>
 
