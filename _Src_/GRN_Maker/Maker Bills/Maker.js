@@ -57,7 +57,6 @@ const Maker = ({ navigation }) => {
         return Time
     }
 
-    console.log("message", filterBillDetails)
 
     function renderItems({ item, index }) {
         console.log("item----------------", item)

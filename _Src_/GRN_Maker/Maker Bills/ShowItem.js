@@ -75,7 +75,11 @@ const ShowItem = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
     setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items);
+    setlist(UpdateBillData.Message.items.map((itm)=>{
+
+
+      return  {...itm,totalqty: Number(itm.qty)+Number(itm.free)}
+    }));
 
     // if (UpdateBillData.Success == true) {
     // }
@@ -336,7 +340,7 @@ const ShowItem = ({ route, navigation }) => {
 
     // console.log("filter Batch----", filterBatch);
 
-    let totalQty = item?.qty + item?.free;
+    let totalQty = Number(item?.qty) + Number(item?.free);
 
     // console.log("Qty, free", item.qty, item.free)
 
@@ -419,11 +423,11 @@ const ShowItem = ({ route, navigation }) => {
 
                     {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
                     <TextInput
-                      placeholder={totalQty.toString()}
+                      value={totalQty == 0? "" : totalQty.toString()}
                       style={{ height: 30, width: 50 }}
                       onChangeText={(text) => {
 
-                        if (totalQty >= text) {
+                        if (item.totalqty >= text) {
 
                           setlist((p) => {
                             p[index].qty = text;
@@ -431,7 +435,9 @@ const ShowItem = ({ route, navigation }) => {
                           })
                         }
                         else {
+
                           alert("You Cannot add more qty !!")
+                        
                         }
                         console.log('p---------->', list)
                       }}
