@@ -196,7 +196,7 @@ const ResendItems = ({ route, navigation }) => {
     return (
       <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
 
-        <View style={{ flexDirection: 'row', flex: 0.9 }}>
+        <View style={{ flexDirection: 'row', flex: 0.9, alignItems: 'center' }}>
           <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '15%', }}>{CustName}</Text>
         </View>
@@ -262,7 +262,7 @@ const ResendItems = ({ route, navigation }) => {
 
               <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
 
-                <Text style={{ fontWeight: '400' }}>manufacturer</Text>
+                <Text style={{ fontWeight: '400' }}>manufacturer :</Text>
 
                 <Text style={{ fontWeight: '800' }}>{item?.manufacturerdescn}</Text>
 
@@ -270,7 +270,7 @@ const ResendItems = ({ route, navigation }) => {
 
               <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly', }}>
 
-                <Text style={{ fontWeight: '400' }}>Unit</Text>
+                <Text style={{ fontWeight: '400' }}>Unit :</Text>
 
                 <Text style={{ fontWeight: '700' }}>{item.unit} </Text>
 
@@ -283,7 +283,7 @@ const ResendItems = ({ route, navigation }) => {
 
               <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
 
-                <Text style={{ fontWeight: '400' }}>marketeer</Text>
+                <Text style={{ fontWeight: '400' }}>marketeer :</Text>
 
                 <Text style={{ fontWeight: '800' }}>{item?.marketeerdescn}</Text>
 
@@ -460,6 +460,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: '2%',
     marginHorizontal: 5,
+    borderLeftWidth: 10,
+    borderColor: 'orange'
   },
   Body_Main_Card_selected: {
     width: '98%',

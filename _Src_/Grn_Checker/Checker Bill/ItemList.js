@@ -317,15 +317,15 @@ const ItemList = ({ route, navigation }) => {
 
               <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
 
-                <Text style={{ fontWeight: '400' }}>manufacturer</Text>
+                <Text style={{ fontWeight: '400' }}>manufacturer :</Text>
 
                 <Text style={{ fontWeight: '800' }}>{item?.manufacturerdescn}</Text>
 
               </View>
 
-              <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly', }}>
+              <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly',flexWrap: 'wrap' }}>
 
-                <Text style={{ fontWeight: '400' }}>Unit</Text>
+                <Text style={{ fontWeight: '400' }}>Unit :</Text>
 
                 <Text style={{ fontWeight: '700' }}>{item.unit} </Text>
 
@@ -338,7 +338,7 @@ const ItemList = ({ route, navigation }) => {
 
               <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
 
-                <Text style={{ fontWeight: '400' }}>marketeer</Text>
+                <Text style={{ fontWeight: '400' }}>marketeer :</Text>
 
                 <Text style={{ fontWeight: '800' }}>{item?.marketeerdescn}</Text>
 
@@ -519,6 +519,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: '2%',
     marginHorizontal: 5,
+    borderLeftWidth: 10,
+    borderColor: 'orange'
   },
   Body_Main_Card_selected: {
     width: '98%',

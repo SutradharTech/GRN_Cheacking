@@ -755,6 +755,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: '2%',
     marginHorizontal: 5,
+    borderLeftWidth: 10,
+    borderColor: 'orange'
 
   },
   card_subViews: {

@@ -89,7 +89,7 @@ const RevertedList = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1,borderRadius: 10, borderColor: 'orange', borderTopWidth: 10 }}>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 {/* <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text> */}
