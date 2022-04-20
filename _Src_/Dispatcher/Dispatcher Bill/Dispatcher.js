@@ -100,7 +100,7 @@ const Dispatcher = ({ navigation }) => {
                             </View>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>Created By</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', color: 'grey' }}>Created By</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500', marginLeft: '4%' }}>{item.userroledescn}</Text>
                             </View>
 

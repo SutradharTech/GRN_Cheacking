@@ -89,11 +89,16 @@ const RevertedList = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn,billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 20, }}>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 {/* <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text> */}
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                            </View>
+
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', color: 'grey' }}>Created By</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', marginLeft: '4%' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />

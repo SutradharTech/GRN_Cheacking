@@ -76,7 +76,7 @@ const DispatcherItem = ({ route, navigation }) => {
 
   }
 
-  // console.log("Arr Images----", arrImages)
+  console.log("Arr Images----", arrImages)
 
   // Resend Data to previous status 
   async function resendCounterBill() {
@@ -230,10 +230,11 @@ const DispatcherItem = ({ route, navigation }) => {
 
                     arrImages.map((img) => {
                       return (
-
-                        <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
-                        // {/* <Image source={{ uri: img }} style={styles.image} /> */}
-
+                        <View style={{borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
+                          <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
+                          {/* <Image source={{ uri: img }} style={styles.image} /> */}
+                          <Text style={{color: 'black', textAlign: 'center'}}>{img?.descn}</Text>
+                        </View>
                       )
 
                     })

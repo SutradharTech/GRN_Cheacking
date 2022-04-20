@@ -27,6 +27,11 @@ const PackerRevertedItems = ({ route, navigation }) => {
   const [arrImages, setarrImages] = useState([]);
   const [imageIndex, setimageIndex] = useState();
   const [visible, setVisible] = React.useState(false);
+  const [noBox, setnoBox] = useState(0);
+  const [noBag, setnoBag] = useState(0);
+  const [noSaline, setnoSaline] = useState(0);
+  const [noJar, setnoJar] = useState(0);
+  const [count, setcount] = useState(0);
 
 
   const showDialog = () => setVisible(true);
@@ -82,19 +87,8 @@ const PackerRevertedItems = ({ route, navigation }) => {
   // Post Api Call (Send to next page) 
   async function addcounterbillimages() {
 
-    let myImages = postImage.map((i) => {
-      console.log("i----", i)
-      return {
-        "domainrecno": 508,
-        "tablerecno": billno.toString(),
-        "image": JSON.stringify(i),
-        "active": true
-      }
-    })
-
-
     let sendApiData = {
-      images: myImages
+      images: postImage
     }
 
     // console.log("sendApiData.length", sendApiData.length)
@@ -149,27 +143,40 @@ const PackerRevertedItems = ({ route, navigation }) => {
     newTodos.splice(index, 1);
     setPostImage(newTodos);
     console.log("NewItem", newTodos);
+
+    setcount(count - 1);
   }
+
+
+  const totalImage = Number(noBox) + Number(noBag) + Number(noSaline) + Number(noJar);
+
+  console.log("totalImage", totalImage);
 
 
   // Taking Photo (function)
   const takePhoto = () => {
 
-    ImagePicker.openCamera({
-      multiple: true,
-      width: 300,
-      height: 400,
-      cropping: true,
-      includeBase64: true
-    }).then(img => {
-      console.log('image=====', img);
+    if (totalImage > count) {
+      ImagePicker.openCamera({
+        multiple: true,
+        width: 300,
+        height: 400,
+        cropping: true,
+        includeBase64: true
+      }).then(img => {
+        // console.log('image=====', img);
 
-      setPostImage((p) => {
+        setPostImage((p) => {
 
-        return [...p, img.data]
-      })
+          return [...p, { domainrecno: 508, tablerecno: billno.toString(), image: img.data, descn: null, active: true }]
+        })
 
-    });
+        setcount(count + 1);
+
+      });
+    } else {
+      alert("You Cannot add more Images !!");
+    }
   };
 
 
@@ -322,14 +329,24 @@ const PackerRevertedItems = ({ route, navigation }) => {
 
                     arrImages.map((img, index) => {
                       return (
-                        <TouchableOpacity onPress={() => {
-                          setimageIndex(index);
-                          showDialog()
-                        }}>
+                        <>
+                          <TouchableOpacity onPress={() => {
+                            setimageIndex(index);
+                            showDialog()
+                          }}>
 
-                          <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
-                          {/* <Image source={{ uri: img }} style={styles.image} /> */}
-                        </TouchableOpacity>
+                            <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
+                            {/* <Image source={{ uri: img }} style={styles.image} /> */}
+                          </TouchableOpacity>
+
+                          <TextInput
+                            style={{ width: '40%', height: 35 }}
+                            defaultValue={img?.descn}
+                            onChangeText={(text) => {
+                              img.descn = text;
+                            }}
+                          />
+                        </>
                       )
 
                     })

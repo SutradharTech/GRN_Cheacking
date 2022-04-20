@@ -141,12 +141,7 @@ const RevertedItems = ({ route, navigation }) => {
       console.log('image=====', image.path);
 
       setisimage(image.path);
-      // setlist((p) => {
-      //   p[selectedIndex].image = image.path
 
-      //   return [...p]
-      // })
-      // console.log('================', list)
     });
   };
 
@@ -164,8 +159,8 @@ const RevertedItems = ({ route, navigation }) => {
           </View>
 
           <View style={{ flex: 0.4, alignItems: 'center' }}>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '20%' }}>Created By</Text>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
+            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>Created By</Text>
+            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '15%' }}>{From}</Text>
           </View>
 
 
@@ -181,12 +176,6 @@ const RevertedItems = ({ route, navigation }) => {
             <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
 
               <Title>Measure</Title>
-
-              {/* Camera Button */}
-              <TouchableOpacity onPress={takePhoto} style={styles.camera_btn} >
-                <MaterialCommunityIcons name={'camera'} size={26} color={'white'} />
-              </TouchableOpacity>
-
 
             </View>
 
@@ -253,9 +242,11 @@ const RevertedItems = ({ route, navigation }) => {
                     arrImages.map((img) => {
                       return (
 
-                        <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
-                        // {/* <Image source={{ uri: img }} style={styles.image} /> */}
-
+                        <View style={{ borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
+                          <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
+                          {/* <Image source={{ uri: img }} style={styles.image} /> */}
+                          <Text style={{ color: 'black', textAlign: 'center' }}>{img?.descn}</Text>
+                        </View>
                       )
 
                     })
