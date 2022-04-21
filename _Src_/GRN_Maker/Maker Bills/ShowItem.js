@@ -75,10 +75,10 @@ const ShowItem = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
     setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items.map((itm)=>{
+    setlist(UpdateBillData.Message.items.map((itm) => {
 
 
-      return  {...itm,totalqty: Number(itm.qty)+Number(itm.free)}
+      return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
     }));
 
     // if (UpdateBillData.Success == true) {
@@ -307,12 +307,12 @@ const ShowItem = ({ route, navigation }) => {
 
         <View style={{ flexDirection: 'row', flex: 0.9, justifyContent: 'center', marginLeft: '2%', alignItems: 'center' }}>
           <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 12, marginRight: '35%' }}>{custName}</Text>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>{custName}</Text>
         </View>
 
         <View style={{ flex: 0.4, alignItems: 'center' }}>
-          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 12, marginRight: '35%' }}>Created By</Text>
-          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 12, marginRight: '35%' }}>{From}</Text>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>Created By</Text>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>{From}</Text>
         </View>
 
       </Card>
@@ -391,7 +391,7 @@ const ShowItem = ({ route, navigation }) => {
 
             {/* Item Details */}
 
-            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70 }}>
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70, }}>
 
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
 
@@ -423,21 +423,22 @@ const ShowItem = ({ route, navigation }) => {
 
                     {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
                     <TextInput
-                      value={totalQty == 0? "" : totalQty.toString()}
+                      value={totalQty == 0 ? "" : totalQty.toString()}
                       style={{ height: 30, width: 50 }}
                       onChangeText={(text) => {
 
                         if (item.totalqty >= text) {
 
                           setlist((p) => {
-                            p[index].qty = text;
+                            
+                            p[index].qty = Number(text)-Number(item.free);
                             return [...p]
                           })
                         }
                         else {
 
                           alert("You Cannot add more qty !!")
-                        
+
                         }
                         console.log('p---------->', list)
                       }}
@@ -496,11 +497,11 @@ const ShowItem = ({ route, navigation }) => {
 
                   color={'orange'}
                   // key={item.key}
-                  status={list[index].attributeschecked ? 'checked' : 'unchecked'}
+                  status={item.attributescheckedbymaker ? 'checked' : 'unchecked'}
                   onPress={(n) => {
                     // console.log('n==>', n)
                     setlist((p) => {
-                      p[index].attributeschecked = !p[index].attributeschecked;
+                      p[index].attributescheckedbymaker = !p[index].attributescheckedbymaker;
 
                       return [...p]
                     })

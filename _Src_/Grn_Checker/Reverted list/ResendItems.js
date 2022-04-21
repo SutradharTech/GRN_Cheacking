@@ -365,6 +365,30 @@ const ResendItems = ({ route, navigation }) => {
 
             </View>
 
+            {/*  Box Atributes  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', marginTop: '1%', }}>
+              <Text>Box</Text>
+              <Text style={{ fontSize: 17 }}> {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <View>
+                <Checkbox
+
+                  color={'orange'}
+                  // key={item.key}
+                  status={item.attributescheckedbychecker ? 'checked' : 'unchecked'}
+                  onPress={(n) => {
+                    // console.log('n==>', n)
+                    setlist((p) => {
+                      p[index].attributescheckedbychecker = !p[index].attributescheckedbychecker;
+
+                      return [...p]
+                    })
+
+                  }}
+                />
+              </View>
+            </View>
+
+
             {/* Free And Batch */}
             <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%' }}>
 

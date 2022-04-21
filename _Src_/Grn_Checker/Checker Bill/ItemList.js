@@ -323,7 +323,7 @@ const ItemList = ({ route, navigation }) => {
 
               </View>
 
-              <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly',flexWrap: 'wrap' }}>
+              <View style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', justifyContent: 'space-evenly', flexWrap: 'wrap' }}>
 
                 <Text style={{ fontWeight: '400' }}>Unit :</Text>
 
@@ -379,6 +379,29 @@ const ItemList = ({ route, navigation }) => {
 
               </View>
 
+            </View>
+
+            {/*  Box Atributes  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', marginTop: '5%', }}>
+              <Text>Box</Text>
+              <Text style={{ fontSize: 17 }}> {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <View>
+                <Checkbox
+
+                  color={'dodgerblue'}
+                  // key={item.key}
+                  status={item.attributescheckedbychecker ? 'checked' : 'unchecked'}
+                  onPress={(n) => {
+                    // console.log('n==>', n)
+                    setlist((p) => {
+                      p[index].attributescheckedbychecker = !p[index].attributescheckedbychecker;
+
+                      return [...p]
+                    })
+
+                  }}
+                />
+              </View>
             </View>
 
             {/* Free And Batch */}
