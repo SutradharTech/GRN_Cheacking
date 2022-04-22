@@ -1,52 +1,65 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, } from 'react-native'
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Banner } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Banner, Modal } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CounterBillStatus from '../../CounterBillStatus';
 
 // console.log("item", route.params.item)
 const RevertedItems = ({ route, navigation }) => {
 
+  const { custName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
+
   const [list, setlist] = useState();
-  const [Salebillfooter, setsalebillfooter] = useState();
   const [flag, setflag] = useState(false);
   const [SelectedBatch, setSelectedBatch] = useState();
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
-  const [visible, setVisible] = React.useState(true);
+  const [visible, setVisible] = useState(true);
+  const [modalVisible, setmodalVisible] = useState(false);
+  const [itemQty, setitemQty] = useState();
+  const [itemBatchList, setitemBatchList] = useState([]);
+  const [filterBatch, setfilterBatch] = useState([]);
 
-  const { billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
+  const showModal = () => setmodalVisible(true);
+  const hideModal = () => setmodalVisible(false);
+
+  const containerStyle = { backgroundColor: 'white', padding: 20 };
+
   // console.log('i=>', i);
 
   useEffect(() => {
     getcounterbill();
+    getbatchno();
   }, [])
 
 
   console.log("list ---> ", list)
 
+  // Api Call for ItemBatch List
+  async function getbatchno() {
 
-  const showDialog = () => setdialog(true);
+    console.log("ApiCall // getbatchno", "domainrecno:", 508, "itemrecno:", null);
 
-  const hideDialog = () => setdialog(false);
+    var sendapidata = {
+      "domainrecno": 508,
+      "itemrecno": null
 
+    }
 
-  var BatchList = [
-    { name: 'A1', value: 0 },
-    { name: 'B1', value: 1 },
-    { name: 'C1', value: 2 },
-    { name: 'D1', value: 3 },
-    // { name: '', value: 2 },
-    // { name: 'Shrink', value: 2 },
-  ]
+    const { data: ItemBatchData } = await axios.post(AppConstants.APIurl2 + 'getstockdata/', sendapidata);
+    // console.log("ApiRes // getcounterbill", ItemBatchData.Message)
 
+    setitemBatchList(ItemBatchData.Message);
+
+  }
 
   // Api Call for items according to bill
   async function getcounterbill() {
@@ -63,107 +76,34 @@ const RevertedItems = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message.items)
 
     setlistHeader(UpdateBillData.Message);
+    setlist(UpdateBillData.Message.items);
 
-    if (UpdateBillData.Success == true) {
-      setlist(UpdateBillData.Message.items);
-    }
+    // if (UpdateBillData.Success == true) {
+    // }
 
   }
 
   console.log('listHeader----', listHeader);
 
   // Post Api Call (Send to next page) 
-  async function addcounterbill(itm) {
+  async function addcounterbill() {
+
+    console.log("Api Call / RevertedItems / addcounterbill", "listHeader:", listHeader, "status:", "Ch", "makerdate:", AppFunction.getToday().dataDate, "makertime:", AppFunction.getTime().dataTime)
 
     let senddataapi = {
-      "items": [
-         {
-           "recno": itm.recno,
-           "shortguid": itm.shortguid,
-           "itemrecno": itm.itemrecno,
-           "itembatchno": itm.itembatchno,
-           "expdate": itm.expdate,
-           "qty": itm.qty,
-           "rate": itm.rate,
-           "amount": itm.amount,
-           "discountamt": itm.discountamt,
-           "picked": !itm.picked,
-           "active": itm.active,
-           "approvalstatus": itm.approvalstatus,
-           "descn": itm.descn,
-           "code": itm.code,
-           "hsn": itm.hsn,
-           "cgstrate": itm.cgstrate,
-           "igstrate": itm.igstrate,
-           "sgstrate": itm.sgstrate,
-           "packtyperecno": itm.packtyperecno,
-           "packtypedescn": itm.packtypedescn,
-           "categoryrecno": itm.categoryrecno,
-           "categorydescn": itm.categorydescn,
-           "uomrecno": itm.uomrecno,
-           "UOM": itm.UOM,
-           "salerate": itm.salerate,
-           "mrp": itm.mrp,
-         }
-       ],
-       "image": "",
-       "custDescn": listHeader.custDescn,
-       "creditallowed": listHeader.creditallowed,
-       "shortguid": listHeader.shortguid,
-       "customerdomainrecno": listHeader.customerdomainrecno,
-       "customerrecno": listHeader.customerrecno,
-       "mobile": listHeader.mobile,
-       "trdate": listHeader.trdate,
-       "trtime": listHeader.trtime,
-       "billno": listHeader.billno,
-       "lockedby": listHeader.lockedby,
-       "lockedby": listHeader.lockedby,
-       "status": "C",
-       "message": listHeader.message,
-       "makerdate": AppFunction.getToday().dataDate,
-       "makertime": AppFunction.getTime().dataTime,
-       "checkerdate": listHeader.checkerdate,
-       "checkertime": listHeader.checkertime,
-       "packerdate": listHeader.packerdate,
-       "packertime": listHeader.packertime,
-       "dispatchdate": listHeader.dispatchdate,
-       "dispatchtime": listHeader.dispatchtime,
-       "transportpickup": listHeader.transportpickup,
-       "transportdate": listHeader.transportdate,
-       "transporttime": listHeader.transporttime,
-       "receiverdate": listHeader.receiverdate,
-       "receivertime": listHeader.receivertime,
-       "boxes": listHeader.boxes,
-       "active": listHeader.active,
-       "amount": listHeader.amount,
-       "discountamt": listHeader.discountamt,
-       "logo": listHeader.logo,
-       "cashamt": listHeader.cashamt,
-       "cardamt": listHeader.cardamt,
-       "walletamt": listHeader.walletamt,
-       "pointsamt": listHeader.pointsamt,
-       "creditamt": listHeader.creditamt,
-       "salereturnamt": listHeader.salereturnamt,
-       "cardrefid": listHeader.cardrefid,
-       "walletrefid": listHeader.walletrefid,
-       "cgstamt": listHeader.cgstamt,
-       "sgstamt": listHeader.sgstamt,
-       "igstamt": listHeader.igstamt,
-       "roundamt": listHeader.roundamt,
-       "spotdiscountamt": listHeader.spotdiscountamt,
-       "tokenno": listHeader.tokenno,
-       "domainposrecno": listHeader.domainposrecno,
-       "domainrecno": listHeader.domainrecno,
-       "domainuserrecno": listHeader.domainuserrecno
-     }
- 
+      ...listHeader,
+      items: list,
+      status: CounterBillStatus.revertedmakertochecker,
+      makerdate: AppFunction.getToday().dataDate,
+      makertime: AppFunction.getTime().dataTime
+    }
 
     console.log('senddataapi----', senddataapi);
 
-    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-    console.log("ApiRes // addcounterbill", UpdateBillData)
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes // addcounterbill", res.data.Messages)
 
-    if (UpdateBillData.Success == true) {
+    if (res.data.Success == true) {
       ApiCall();
       navigation.navigate('RevertedList');
     }
@@ -171,19 +111,19 @@ const RevertedItems = ({ route, navigation }) => {
   }
 
 
-   // Function to check all checkbox is true  
-   function SubmitCondition() {
+  // Function to check all checkbox is true  
+  function SubmitCondition() {
     const result = list.filter(Check);
 
     function Check(item) {
       return item.picked == false;
     }
-    console.log("Check------>", result.length)
+    console.log("Picked------>", result.length)
     if (result.length == 0) {
-      list.map((itm) => {
-        console.log('itm=======', itm);
-        addcounterbill(itm);
-      })
+      // list.map((itm) => {
+      //   console.log('itm=======', itm);
+      // })
+      addcounterbill();
     }
     else {
       alert('Please Check All box')
@@ -218,8 +158,8 @@ const RevertedItems = ({ route, navigation }) => {
   }
 
 
-   // Checkbox Select Api Call
-   async function counterbillfooter(item) {
+  // Checkbox Select Api Call
+  async function counterbillfooter(item) {
 
     console.log("ApiCall // counterbillfooter/", item);
 
@@ -234,6 +174,7 @@ const RevertedItems = ({ route, navigation }) => {
       "amount": item.amount,
       "discountamt": item.discountamt,
       "picked": item.picked,
+      "checked": item.checked,
       "active": item.active,
       "approvalstatus": item.approvalstatus,
       "descn": item.descn,
@@ -260,19 +201,72 @@ const RevertedItems = ({ route, navigation }) => {
 
     const FooterBillData = await axios.patch(AppConstants.APIurl2 + 'counterbillfooter/', senddataapi);
     console.log("ApiRes // counterbillfooter/", FooterBillData.data)
-    // setsalebillfooter(FooterBillData.data);
   }
+
+
+  // Send To Api Batch
+  function sendBatchCondition() {
+    let sendBatch = filterBatch.filter(b => b.qty != 0);
+
+    console.log('sendBatch', sendBatch);
+
+    sendBatch.map(item => {
+      var newdata = list.filter(
+        itm =>
+          itm.itembatchno == item.itembatchno &&
+          itm.itemrecno == item.itemrecno,
+      );
+
+      console.log("newdata", newdata)
+
+      if (newdata.length > 0) {
+        setlist(p => {
+          var updatebatch = p;
+
+          var index = updatebatch.indexOf(newdata[0]);
+
+          updatebatch[index].qty = item.qty;
+
+          return [...updatebatch];
+        });
+      } else {
+        setlist(p => {
+          return [...p, { ...item, shortguid: uuidv4() }];
+        });
+      }
+    });
+
+    setmodalVisible((p) => !p)
+  }
+
+  const Total = filterBatch.reduce((prev, curr) => Number(prev) + Number(curr.qty), 0)
+
+  let pending = itemQty - Total
+
+  console.log("Total", Total)
 
 
   // Flatlist Header
   const ListHeader = () => {
     //View to set in Header
     return (
-      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-        <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-        <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 18, marginRight: '35%' }}>{listHeader?.custDescn}</Text>
+      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', }}>
 
-        <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisible(!visible)} />
+        <View style={{ flexDirection: 'row', flex: 0.9, marginLeft: '3%', alignItems: 'center' }}>
+          <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '35%' }}>{custName}</Text>
+        </View>
+
+        <View style={{ flex: 0.6 }}>
+
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '35%' }}>Created By</Text>
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '35%' }}>{From}</Text>
+
+        </View>
+
+        <View style={{ marginRight: '2%', flex: 0.15 }}>
+          <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisible(!visible)} />
+        </View>
       </Card>
     );
   };
@@ -280,6 +274,26 @@ const RevertedItems = ({ route, navigation }) => {
 
   // render Function
   function renderItems({ item, index }) {
+
+    function filterBatchfun(recno, qty) {
+
+      let result = itemBatchList.filter(batch => batch.itemrecno == recno)
+
+      console.log("result ---->", result);
+
+      let res = result.map((i, index) => {
+
+        return { ...i, qty: 0 }
+      })
+
+      setitemQty(qty);
+      setfilterBatch(res);
+    }
+
+    console.log("filter Batch----", filterBatch);
+
+
+
     return (
       <>
         <View style={{ flex: 1, margin: "1%", marginHorizontal: '3%' }}>
@@ -296,22 +310,21 @@ const RevertedItems = ({ route, navigation }) => {
 
               {/* Checkbox View */}
 
-              <View style={{ flex: 0.9, justifyContent: 'space-evenly', alignItems: 'center', backgroundColor: 'lightgray', borderRadius: 12, flexDirection: 'row' }}>
+              <View style={{ flex: 0.3, justifyContent: 'space-evenly', alignItems: 'center', borderRadius: 12, flexDirection: 'row' }}>
 
                 <View>
-                  {
-                    item.picked == false ? (<><Text style={{ fontWeight: '700', fontSize: 15, }}>Pick-up</Text></>) : (<><Text style={{ fontSize: 15, fontWeight: '700', color: 'dodgerblue' }}>Discard</Text></>)
-                  }
-                </View>
-                <View>
+
+
                   <Checkbox
 
                     color={'dodgerblue'}
                     // key={item.key}
+                    disabled={item.checked == 1 ? true : false}
                     status={list[index].picked ? 'checked' : 'unchecked'}
                     onPress={(n) => {
-                      // console.log('n==>', n)
+
                       setlist((p) => {
+
                         p[index].picked = !p[index].picked;
                         let item = p[index];
                         counterbillfooter(item)
@@ -320,7 +333,13 @@ const RevertedItems = ({ route, navigation }) => {
 
                     }}
                   />
+
+                  {
+                    console.log("list---", list)
+                  }
                 </View>
+
+
               </View>
             </View>
 
@@ -328,170 +347,150 @@ const RevertedItems = ({ route, navigation }) => {
 
             {/* Item Details */}
 
-            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', height: 50 }}>
 
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
+              <View style={{ alignItems: 'center', flexDirection: 'row', width: '60%', justifyContent: 'space-around', marginVertical: '4%' }}>
 
-                {/*  Qty and Amount */}
-                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%' }}>
+                <Text style={{ fontSize: 15, fontWeight: '500' }}>marketeer</Text>
+                <Text>{item.marketeerdescn}</Text>
 
-                  <View>
-                    <Text style={{ fontWeight: '400' }}>Quntity : </Text>
-                  </View>
-                  <View>
-                    {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
-                    <TextInput
-                      placeholder={item.qty.toString()}
-                      style={{ height: 30, width: 60 }}
-                      onChangeText={(text) => {
-                        setlist((p) => {
-                          p[index].qty = text;
-                          return [...p]
-                        })
-                        console.log('p---------->', list)
-                      }}
-                      keyboardType='number-pad'
+              </View>
 
-                    />
-                  </View>
+              <View style={{ alignItems: 'center', flexDirection: 'row', width: '40%', justifyContent: 'space-around', marginVertical: '4%' }}>
+
+                <Text style={{ fontSize: 15, fontWeight: '500' }}>Unit</Text>
+
+                <Text>{item.unit}</Text>
+
+              </View>
+            </View>
+
+            <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70, }}>
+
+                {/*  Qty */}
+                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%', flex: 1 }}>
+
+                  <Text style={{ fontWeight: '400' }}>Quntity : </Text>
+
+                  {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
+                  <TextInput
+                    placeholder={(item?.qty + item?.free).toString()}
+                    style={{ height: 30, width: 60 }}
+                    disabled={item.checked == 1 ? true : false}
+                    onChangeText={(text) => {
+                      setlist((p) => {
+                        p[index].qty = text;
+                        return [...p]
+                      })
+                      console.log('p---------->', list)
+                    }}
+                    keyboardType='number-pad'
+
+                  />
 
 
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginVertical: '2%' }}>
-
-                    <View>
-                      <Text style={{ fontWeight: '400' }}>Amount : </Text>
-                    </View>
-
-                    <View>
-                      {/* <Text style={{ fontWeight: '600' }}>Rs. {item.amount}</Text> */}
-                      <TextInput
-                        style={{ fontWeight: '600', height: 40 }}
-                        defaultValue={item.amount.toString()}
-                        onChangeText={(text) => {
-                          setlist((p) => {
-                            p[index].amount = text;
-                            return [...p]
-                          })
-                          console.log('p---------->', list)
-                        }}
-                      />
-                    </View>
-                  </View>
                 </View>
 
-                {/*  Expiry Date  */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
+                <View style={{ alignItems: 'center', flexDirection: 'column', width: '50%', justifyContent: 'space-around', marginVertical: '4%', flexWrap: 'nowrap', flex: 1.5 }}>
 
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
+                  <Text style={{ fontSize: 15, fontWeight: '500' }}>manufacturer</Text>
+                  <Text>{item.manufacturerdescn}</Text>
 
-                    <View>
-                      <Text style={{ fontWeight: '400' }}>Expiry Date</Text>
-                    </View>
-                    <View>
+                </View>
 
-                      <TextInput
-                        style={{ fontWeight: '600', height: 30 }}
-                        defaultValue={showDate_ddmmyy(item.expdate)}
-                        onChangeText={(text) => {
-                          let dt = text;
-                          setlist((p) => {
-                            let formatdate = formatDate(dt);
-                            p[index].expdate = formatdate;
-                            return [...p]
-                          })
-                          console.log('Format Exp Date---------->', list)
-                        }}
-                      />
-                    </View>
+            </View>
 
-                  </View>
+            {/*  Expiry Date and MRP  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginVertical: '2%' }}>
 
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', marginTop: '6%' }}>
+
+                {/* Expiry Date */}
+                <View>
+                  <Text style={{ fontWeight: '400' }}>Expiry Date</Text>
+                </View>
+                <View>
+
+                  <Text>{showDate_ddmmyy(item.expdate)}</Text>
+
+                </View>
+
+                {/* MRP */}
+                <View>
+                  <Text style={{ fontWeight: '600' }}>MRP</Text>
+                </View>
+                <View>
+                  <Text style={{ fontWeight: '600' }}>{item.mrp}</Text>
                 </View>
 
               </View>
 
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '100%', marginTop: '5%' }}>
+
+
+            {/*  Box Atributes  */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%', marginTop: '5%', }}>
               <Text>Box</Text>
-              <Text style={{ fontSize: 17 }}> {item?.outerbox}  X  {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <Text style={{ fontSize: 17 }}> {item?.innerbox}  X  {item?.pack}  X  {item?.unit}</Text>
+              <View>
+                <Checkbox
+
+                  color={'orange'}
+                  disabled={item.checked == 1 ? true : false}
+                  // key={item.key}
+                  status={list[index].attributeschecked ? 'checked' : 'unchecked'}
+                  onPress={(n) => {
+                    // console.log('n==>', n)
+                    setlist((p) => {
+                      p[index].attributeschecked = !p[index].attributeschecked;
+
+                      return [...p]
+                    })
+
+                  }}
+                />
+              </View>
             </View>
 
             {/*  Batch No  */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', marginVertical: '2%' }}>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Batch No : </Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Batch No : </Text>
 
-              <View>
-                <TextInput
-                  style={{ fontWeight: '600', height: 40 }}
-                  defaultValue={item.itembatchno}
-                  onChangeText={(text) => {
-                    setlist((p) => {
-                      p[index].itembatchno = text;
-                      return [...p]
-                    })
-                    console.log('p---------->', list)
-                  }}
-                />
-              </View>
+              <Text style={{ fontWeight: '400' }}>{item.itembatchno}</Text>
 
-              {/* Dropdown for batch seleection */}
-              {/* <Picker
-                selectedValue={SelectedBatch}
-                style={{ width: '40%' }}
-                onValueChange={(BatchValue) => {
+              {
+                item.checked == 1 ? (null) : (
 
-                  setSelectedBatch(BatchValue.name) */}
-              {/* // console.log('------>',SelectedWarehouse.value)
-                  // setApiData(p => {
-                  //     var newdata = p
-                  //     newdata[index].Warehouse = itemValue
-                  //     console.log("newdata", newdata)
-
-                  //     return [...newdata]
-                  // })
-                }
-                }
-              // mode='dropdown' 
-              > */}
-              {/* <Picker.Item label={"select"} />
-
-                {
-                  BatchList.map(batch => {
-
-                    return (
-                      <Picker.Item label={batch.name} value={batch} />
-                    )
-                  })
-                }
-
-              </Picker> */}
+                  <TouchableOpacity>
+                    <Button
+                      style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                      onPress={() => { filterBatchfun(item.itemrecno, item.qty), showModal() }}
+                    >
+                      <Text style={{ color: 'orange' }}>Add Batch</Text>
+                    </Button>
+                  </TouchableOpacity>
+                )
+              }
 
             </View>
 
             {/*  Location name and code  */}
             <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginVertical: '2%' }}>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Location :</Text>
-              </View>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>{item.location}</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Location :</Text>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>Location code :</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>{item.location}</Text>
 
-              <View>
-                <Text style={{ fontWeight: '400' }}>{item.locationcode}</Text>
-              </View>
+              <Text style={{ fontWeight: '400' }}>Location code :</Text>
+
+              <Text style={{ fontWeight: '400' }}>{item.locationcode}</Text>
+
 
             </View>
+
 
           </Card>
         </View >
@@ -516,7 +515,7 @@ const RevertedItems = ({ route, navigation }) => {
           // },
         ]}
       >
-        {listHeader?.message}
+        {/* {listHeader?.message} */}
       </Banner>
 
 
@@ -546,6 +545,98 @@ const RevertedItems = ({ route, navigation }) => {
 
       </View>
 
+
+      <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle} style={{ height: "75%" }}>
+        <ScrollView>
+          <View style={{ flex: 1 }}>
+
+            <View style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                {`Batch:  `}
+              </Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                Exp Date:
+              </Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                stock:
+              </Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                {`Quantity:  `}
+              </Text>
+            </View>
+
+            {
+              filterBatch.map((batch, index) => {
+
+                return (
+                  <View key={batch.itembatchno} style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                      {batch.itembatchno}
+                    </Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                      {batch.expdate}
+                    </Text>
+                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                      {batch.totalstock}
+                    </Text>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder={'Qty'}
+                      keyboardType='numeric'
+                      onChangeText={(text) => {
+                        setfilterBatch((p) => {
+                          p[index].qty = text;
+
+                          return [...p];
+
+                        })
+                      }}
+
+                    // onChangeText={textChangeHandler}
+                    />
+
+
+
+                  </View>
+                )
+              })
+            }
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Pending</Text>
+                <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{pending}</Text>
+              </View>
+
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Projected</Text>
+                <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{itemQty}</Text>
+              </View>
+
+              {/*  Submit Bill  */}
+              <TouchableOpacity>
+                {
+                  pending == 0 ?
+                    <>
+                      <Button
+                        style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+                        onPress={sendBatchCondition}
+                      >
+                        <Text style={{ color: 'white' }}>Submit</Text>
+                      </Button>
+                    </>
+                    :
+                    (null)
+                }
+
+              </TouchableOpacity>
+            </View>
+
+          </View>
+        </ScrollView>
+      </Modal>
+
     </View>
   )
 }
@@ -567,6 +658,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: '2%',
     marginHorizontal: 5,
+    borderLeftWidth: 10,
+    borderColor: 'orange'
 
   },
   card_subViews: {
@@ -585,5 +678,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: 7,
   },
+  searchInput: {
+    borderWidth: 0,
+    width: '25%',
+    color: 'black',
+    height: 30
+  }
 
 })

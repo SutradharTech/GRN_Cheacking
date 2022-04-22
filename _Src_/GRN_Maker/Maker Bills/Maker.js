@@ -19,7 +19,7 @@ const Maker = ({ navigation }) => {
 
     async function ApiCall() {
 
-        console.log("Api Data // getcounterbillall", "domairecno :", 508, "status :", "P")
+        console.log("Api Call // getcounterbillall", "domairecno :", 508, "status :", "M")
 
         setRefreshing(true);
 
@@ -57,6 +57,7 @@ const Maker = ({ navigation }) => {
         return Time
     }
 
+
     function renderItems({ item, index }) {
         console.log("item----------------", item)
         return (
@@ -65,12 +66,20 @@ const Maker = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ShowItem', { billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ShowItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
                             </View>
+
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Created By :</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.userroledescn}</Text>
+                            </View>
+
+                            {/* <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{filterBillDetails.messages?.message}</Text>
+                            </View> */}
 
                             <Divider />
 
@@ -80,7 +89,7 @@ const Maker = ({ navigation }) => {
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill No :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.billno}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Date :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showDate_ddmmyy(item.trdate)}</Text>
                                 </View>

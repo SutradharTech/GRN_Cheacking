@@ -6,9 +6,9 @@ import { Checkbox, Divider, TextInput, Button, List } from 'react-native-paper';
 import { Card } from 'react-native-shadow-cards';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/Ionicons';
-import AppConstants from '../AppConstant';
+import AppConstants from '../../AppConstant';
 
-const Transport1 = ({ navigation }) => {
+const Dispatcher = ({ navigation }) => {
 
     useEffect(() => {
         ApiCall();
@@ -29,7 +29,7 @@ const Transport1 = ({ navigation }) => {
 
         var senddataapi = {
             "domainrecno": 508,
-            "status": "T"
+            "status": "D"
         }
 
         const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
@@ -67,6 +67,24 @@ const Transport1 = ({ navigation }) => {
     // console.log('filterBillDetais----', filterBillDetais)
 
 
+    // Function to check all checkbox is true  
+    function patchData() {
+        const result = filterBillDetais.filter(Check);
+
+        function Check(item) {
+            return item.isChecked == true;
+        }
+        // console.log("Check------>", result.length)
+        if (result.length > 0) {
+            addcounterbill(result);
+            // alert('Success');
+        }
+        else {
+            alert('Please Select Min one Bill')
+        }
+    }
+
+
     // Render Item (function)
     function renderItems({ item, index }) {
         return (
@@ -75,11 +93,15 @@ const Transport1 = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('TransportItems', { billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 10, borderColor: 'orange', borderTopWidth: 10 }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('DispatcherItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 10, borderColor: 'orange', borderTopWidth: 10 }}>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                            </View>
+
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', color: 'grey' }}>Created By</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', marginLeft: '4%' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />
@@ -140,7 +162,7 @@ const Transport1 = ({ navigation }) => {
     )
 }
 
-export default Transport1
+export default Dispatcher
 
 const styles = StyleSheet.create({
 

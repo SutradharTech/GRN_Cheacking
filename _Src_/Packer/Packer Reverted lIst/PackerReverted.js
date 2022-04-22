@@ -6,9 +6,11 @@ import { Checkbox, Divider, TextInput, Button, List } from 'react-native-paper';
 import { Card } from 'react-native-shadow-cards';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/Ionicons';
-import AppConstants from '../AppConstant';
+import AppConstants from '../../AppConstant';
+import CounterBillStatus from '../../CounterBillStatus';
 
-const Transport1 = ({ navigation }) => {
+const PackerReverted = ({ navigation }) => {
+
 
     useEffect(() => {
         ApiCall();
@@ -17,9 +19,6 @@ const Transport1 = ({ navigation }) => {
 
     const [filterBillDetais, setfilterBillDetais] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
-    const [NoBox, setNoBox] = useState();
-    const [expanded, setExpanded] = React.useState(true);
-    const [newArr, setnewArr] = useState([]);
 
 
     // Api Call getcounterbillall
@@ -29,7 +28,7 @@ const Transport1 = ({ navigation }) => {
 
         var senddataapi = {
             "domainrecno": 508,
-            "status": "T"
+            "status": CounterBillStatus.returntopacker
         }
 
         const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
@@ -38,8 +37,6 @@ const Transport1 = ({ navigation }) => {
         setfilterBillDetais(FilterBillData.data.Message)
 
     }
-
-
 
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
@@ -54,6 +51,7 @@ const Transport1 = ({ navigation }) => {
         return dt;
     };
 
+    // Formating Time Function
     function showTime(time) {
 
         let n = time;
@@ -63,9 +61,7 @@ const Transport1 = ({ navigation }) => {
         return Time
     }
 
-
     // console.log('filterBillDetais----', filterBillDetais)
-
 
     // Render Item (function)
     function renderItems({ item, index }) {
@@ -75,11 +71,15 @@ const Transport1 = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('TransportItems', { billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 10, borderColor: 'orange', borderTopWidth: 10 }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('PackerRevertedItems', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange',  borderRadius: 10,}}>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Customer Name :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                            </View>
+
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '400' }}>Created by</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500', marginLeft: '4%' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />
@@ -90,11 +90,11 @@ const Transport1 = ({ navigation }) => {
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill No :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.billno}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Date :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showDate_ddmmyy(item.trdate)}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Time :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showTime(item.trtime)}</Text>
                                 </View>
@@ -140,7 +140,7 @@ const Transport1 = ({ navigation }) => {
     )
 }
 
-export default Transport1
+export default PackerReverted
 
 const styles = StyleSheet.create({
 
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         // height:'64%',
         borderRadius: 10,
-        width: '90%'
+        width: '90%',
 
     },
 })

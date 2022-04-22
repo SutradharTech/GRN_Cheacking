@@ -5,6 +5,7 @@ import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Button, Divider } from 'react-native-paper';
 import AppConstants from '../../AppConstant';
+import CounterBillStatus from '../../CounterBillStatus';
 
 const RevertedList = ({ navigation }) => {
 
@@ -25,7 +26,7 @@ const RevertedList = ({ navigation }) => {
 
         var sendapidata = {
             "domainrecno": 508,
-            "status": "RM"
+            "status": CounterBillStatus.checkertomaker
         }
 
         const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', sendapidata);
@@ -65,11 +66,16 @@ const RevertedList = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { message: filterBillDetails.message, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('RevertedItems', { custName: item.custdescn,From: item.userroledescn ,message: filterBillDetails.message, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
 
-                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%',flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Cust Name :</Text>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                            </View>
+
+                            <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%' }}>
+                                <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Created By :</Text>
+                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.userroledescn}</Text>
                             </View>
 
                             <Divider />
@@ -84,7 +90,7 @@ const RevertedList = ({ navigation }) => {
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Date :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showDate_ddmmyy(item.trdate)}</Text>
                                 </View>
-                                <View style={{ flex: 3, marginHorizontal: '3%', alignItems: 'center' }}>
+                                <View style={{ flex: 3, marginHorizontal: '2%', alignItems: 'center' }}>
                                     <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey' }}>Bill Time :</Text>
                                     <Text style={{ ...styles.content_text, fontWeight: '500' }}>{showTime(item.trtime)}</Text>
                                 </View>

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react
 import React, { useState, useEffect } from 'react';
 import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-picker';
 import { Card } from 'react-native-shadow-cards';
-import { Button } from 'react-native-paper';
+import { Button, Modal } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../AppFunction';
 import AppConstants from '../AppConstant';
@@ -38,9 +38,9 @@ const TransportItems = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
     setlistHeader(UpdateBillData.Message);
-    if (UpdateBillData.Success == true) {
-      setlist(UpdateBillData.Message.items);
-    }
+    setlist(UpdateBillData.Message.items);
+    // if (UpdateBillData.Success == true) {
+    // }
 
   }
 
@@ -49,89 +49,93 @@ const TransportItems = ({ route, navigation }) => {
   // Post Api Call (Send to next page) 
   async function addcounterbill(itm) {
 
-    console.log('itm-----', itm);
-    console.log('ListHeader-----', listHeader)
+    console.log("Api Call / TransportItems / addcounterbill /", "listHeader:", listHeader, "status:", "CR", "transportdate:", AppFunction.getToday().dataDate, "transporttime:", AppFunction.getTime().dataTime);
 
     let senddataapi = {
-      "items": [
-        {
-          "recno": itm.recno,
-          "shortguid": itm.shortguid,
-          "itemrecno": itm.itemrecno,
-          "itembatchno": itm.itembatchno,
-          "expdate": itm.expdate,
-          "qty": itm.qty,
-          "rate": itm.rate,
-          "amount": itm.amount,
-          "discountamt": itm.discountamt,
-          "picked": itm.picked,
-          "active": itm.active,
-          "approvalstatus": itm.approvalstatus,
-          "descn": itm.descn,
-          "code": itm.code,
-          "hsn": itm.hsn,
-          "cgstrate": itm.cgstrate,
-          "igstrate": itm.igstrate,
-          "sgstrate": itm.sgstrate,
-          "packtyperecno": itm.packtyperecno,
-          "packtypedescn": itm.packtypedescn,
-          "categoryrecno": itm.categoryrecno,
-          "categorydescn": itm.categorydescn,
-          "uomrecno": itm.uomrecno,
-          "UOM": itm.UOM,
-          "salerate": itm.salerate,
-          "mrp": itm.mrp,
-        }
-      ],
-      "image": listHeader.image,
-      "custDescn": listHeader.custDescn,
-      "creditallowed": listHeader.creditallowed,
-      "shortguid": listHeader.shortguid,
-      "customerdomainrecno": listHeader.customerdomainrecno,
-      "customerrecno": listHeader.customerrecno,
-      "mobile": listHeader.mobile,
-      "trdate": listHeader.trdate,
-      "trtime": listHeader.trtime,
-      "billno": listHeader.billno,
-      "lockedby": listHeader.lockedby,
-      "lockedby": listHeader.lockedby,
-      "status": "CR",
-      "message": listHeader.message,
-      "makerdate": listHeader.makerdate,
-      "makertime": listHeader.makertime,
-      "checkerdate": listHeader.checkerdate,
-      "checkertime": listHeader.checkertime,
-      "packerdate": listHeader.packerdate,
-      "packertime": listHeader.packertime,
-      "dispatchdate": listHeader.dispatchdate,
-      "dispatchtime": listHeader.dispatchtime,
-      "transportpickup": listHeader.transportpickup,
-      "transportdate": AppFunction.getToday().dataDate,
-      "transporttime": AppFunction.getTime().dataTime,
-      "receiverdate": listHeader.receiverdate,
-      "receivertime": listHeader.receivertime,
-      "boxes": listHeader.boxes,
-      "active": listHeader.active,
-      "amount": listHeader.amount,
-      "discountamt": listHeader.discountamt,
-      "logo": listHeader.logo,
-      "cashamt": listHeader.cashamt,
-      "cardamt": listHeader.cardamt,
-      "walletamt": listHeader.walletamt,
-      "pointsamt": listHeader.pointsamt,
-      "creditamt": listHeader.creditamt,
-      "salereturnamt": listHeader.salereturnamt,
-      "cardrefid": listHeader.cardrefid,
-      "walletrefid": listHeader.walletrefid,
-      "cgstamt": listHeader.cgstamt,
-      "sgstamt": listHeader.sgstamt,
-      "igstamt": listHeader.igstamt,
-      "roundamt": listHeader.roundamt,
-      "spotdiscountamt": listHeader.spotdiscountamt,
-      "tokenno": listHeader.tokenno,
-      "domainposrecno": listHeader.domainposrecno,
-      "domainrecno": listHeader.domainrecno,
-      "domainuserrecno": listHeader.domainuserrecno
+
+      ...listHeader,
+      status: 'CR',
+      transportdate: AppFunction.getToday().dataDate,
+      transporttime: AppFunction.getTime().dataTime
+      // "items": [
+      //   {
+      //     "recno": itm.recno,
+      //     "shortguid": itm.shortguid,
+      //     "itemrecno": itm.itemrecno,
+      //     "itembatchno": itm.itembatchno,
+      //     "expdate": itm.expdate,
+      //     "qty": itm.qty,
+      //     "rate": itm.rate,
+      //     "amount": itm.amount,
+      //     "discountamt": itm.discountamt,
+      //     "picked": itm.picked,
+      //     "active": itm.active,
+      //     "approvalstatus": itm.approvalstatus,
+      //     "descn": itm.descn,
+      //     "code": itm.code,
+      //     "hsn": itm.hsn,
+      //     "cgstrate": itm.cgstrate,
+      //     "igstrate": itm.igstrate,
+      //     "sgstrate": itm.sgstrate,
+      //     "packtyperecno": itm.packtyperecno,
+      //     "packtypedescn": itm.packtypedescn,
+      //     "categoryrecno": itm.categoryrecno,
+      //     "categorydescn": itm.categorydescn,
+      //     "uomrecno": itm.uomrecno,
+      //     "UOM": itm.UOM,
+      //     "salerate": itm.salerate,
+      //     "mrp": itm.mrp,
+      //   }
+      // ],
+      // "image": listHeader.image,
+      // "custDescn": listHeader.custDescn,
+      // "creditallowed": listHeader.creditallowed,
+      // "shortguid": listHeader.shortguid,
+      // "customerdomainrecno": listHeader.customerdomainrecno,
+      // "customerrecno": listHeader.customerrecno,
+      // "mobile": listHeader.mobile,
+      // "trdate": listHeader.trdate,
+      // "trtime": listHeader.trtime,
+      // "billno": listHeader.billno,
+      // "lockedby": listHeader.lockedby,
+      // "lockedby": listHeader.lockedby,
+      // "status": "CR",
+      // "message": listHeader.message,
+      // "makerdate": listHeader.makerdate,
+      // "makertime": listHeader.makertime,
+      // "checkerdate": listHeader.checkerdate,
+      // "checkertime": listHeader.checkertime,
+      // "packerdate": listHeader.packerdate,
+      // "packertime": listHeader.packertime,
+      // "dispatchdate": listHeader.dispatchdate,
+      // "dispatchtime": listHeader.dispatchtime,
+      // "transportpickup": listHeader.transportpickup,
+      // "transportdate": AppFunction.getToday().dataDate,
+      // "transporttime": AppFunction.getTime().dataTime,
+      // "receiverdate": listHeader.receiverdate,
+      // "receivertime": listHeader.receivertime,
+      // "boxes": listHeader.boxes,
+      // "active": listHeader.active,
+      // "amount": listHeader.amount,
+      // "discountamt": listHeader.discountamt,
+      // "logo": listHeader.logo,
+      // "cashamt": listHeader.cashamt,
+      // "cardamt": listHeader.cardamt,
+      // "walletamt": listHeader.walletamt,
+      // "pointsamt": listHeader.pointsamt,
+      // "creditamt": listHeader.creditamt,
+      // "salereturnamt": listHeader.salereturnamt,
+      // "cardrefid": listHeader.cardrefid,
+      // "walletrefid": listHeader.walletrefid,
+      // "cgstamt": listHeader.cgstamt,
+      // "sgstamt": listHeader.sgstamt,
+      // "igstamt": listHeader.igstamt,
+      // "roundamt": listHeader.roundamt,
+      // "spotdiscountamt": listHeader.spotdiscountamt,
+      // "tokenno": listHeader.tokenno,
+      // "domainposrecno": listHeader.domainposrecno,
+      // "domainrecno": listHeader.domainrecno,
+      // "domainuserrecno": listHeader.domainuserrecno
     }
 
     console.log('senddataapi----', senddataapi);
@@ -171,29 +175,32 @@ const TransportItems = ({ route, navigation }) => {
   };
 
   return (
-    <>
-      <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-        <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-        <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 18, marginRight: '35%' }}>{listHeader?.custDescn}</Text>
-      </Card>
+    <Modal >
 
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-        <Card style={{ flex: 0.4, alignItems: 'center', justifyContent: 'space-around', padding: '2%' }}>
+      <>
+        <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+          <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+          <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 18, marginRight: '35%' }}>{listHeader?.custDescn}</Text>
+        </Card>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%' }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-            <Text style={{ fontSize: 18, fontWeight: '600' }}>Box :</Text>
-            <Text style={{ fontSize: 18, fontWeight: '600' }}>{listHeader?.boxes}</Text>
+          <Card style={{ flex: 0.4, alignItems: 'center', justifyContent: 'space-around', padding: '2%' }}>
 
-            {/* Camera Button */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', width: '100%' }}>
 
-            {/* <TouchableOpacity onPress={takePhoto} style={styles.video_btn} >
+              <Text style={{ fontSize: 18, fontWeight: '600' }}>Box :</Text>
+              <Text style={{ fontSize: 18, fontWeight: '600' }}>{listHeader?.boxes}</Text>
+
+              {/* Camera Button */}
+
+              {/* <TouchableOpacity onPress={takePhoto} style={styles.video_btn} >
               <MaterialCommunityIcons name={'camera'} size={30} color={'orange'} />
             </TouchableOpacity>
             */}
 
-          </View> 
+            </View>
 
 
             {/* {
@@ -218,27 +225,28 @@ const TransportItems = ({ route, navigation }) => {
 
             </View>
 
-        </Card>
+          </Card>
 
 
-        {/* Submit button */}
+          {/* Submit button */}
 
-        <TouchableOpacity>
-          <Button
-            style={{ backgroundColor: 'orange', width: '40%', alignSelf: 'center', top: '50%', elevation: 5 }}
-            onPress={() => {
-              list.map((itm) => {
-                console.log('itm=======', itm);
-                addcounterbill(itm);
-              })
-            }}
-          >
-            <Text style={{ color: 'white' }}>Submit</Text>
-          </Button>
-        </TouchableOpacity>
+          <TouchableOpacity>
+            <Button
+              style={{ backgroundColor: 'orange', width: '40%', alignSelf: 'center', top: '50%', elevation: 5 }}
+              onPress={() => {
+                // list.map((itm) => {
+                //   console.log('itm=======', itm);
+                // })
+                addcounterbill();
+              }}
+            >
+              <Text style={{ color: 'white' }}>Submit</Text>
+            </Button>
+          </TouchableOpacity>
 
-      </View>
-    </>
+        </View>
+      </>
+    </Modal>
   )
 }
 
