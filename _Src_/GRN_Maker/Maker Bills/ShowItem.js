@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Dialog, Portal, Provider, Modal } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Dialog, Portal, Provider, Modal, Banner } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction'
@@ -22,6 +22,7 @@ const ShowItem = ({ route, navigation }) => {
   const [dialog, setdialog] = useState(false);
   const [itemBatchList, setitemBatchList] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
   const [itemRecno, setitemRecno] = useState();
   const [filterBatch, setfilterBatch] = useState([]);
   const [itemQty, setitemQty] = useState();
@@ -315,6 +316,10 @@ const ShowItem = ({ route, navigation }) => {
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>{From}</Text>
         </View>
 
+        <View style={{ marginRight: '2%', flex: 0.15 }}>
+          <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
+        </View>
+
       </Card>
     );
   };
@@ -422,24 +427,32 @@ const ShowItem = ({ route, navigation }) => {
                     <Text style={{ fontWeight: '400' }}>Quntity : </Text>
 
                     {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
+
                     <TextInput
                       value={totalQty == 0 ? "" : totalQty.toString()}
                       style={{ height: 30, width: 50 }}
                       onChangeText={(text) => {
 
-                        if (item.totalqty >= text) {
+                        try {
 
-                          setlist((p) => {
-                            
-                            p[index].qty = Number(text)-Number(item.free);
-                            return [...p]
-                          })
+                          if (item.totalqty >= text) {
+
+                            setlist((p) => {
+
+                              p[index].qty = Number(text) - Number(item.free);
+                              return [...p]
+                            })
+                          }
+                          else {
+
+                            alert("You Cannot add more qty !!")
+
+                          }
+
+                        } catch (error) {
+                          console.log(error);
                         }
-                        else {
 
-                          alert("You Cannot add more qty !!")
-
-                        }
                         console.log('p---------->', list)
                       }}
                       keyboardType='number-pad'
@@ -562,6 +575,22 @@ const ShowItem = ({ route, navigation }) => {
       <Portal>
 
         <View style={{ flex: 1 }}>
+
+          <Banner
+            visible={VisibleMsg}
+            actions={[
+              // {
+              //   label: 'Fix it',
+              //   onPress: () => setVisible(false),
+              // },
+              // {
+              //   label: 'Learn more',
+              //   onPress: () => setVisible(false),
+              // },
+            ]}
+          >
+            {/* {listHeader?.message} */}
+          </Banner>
 
           <FlatList
             // data={BillDetails}

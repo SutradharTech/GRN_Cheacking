@@ -24,6 +24,7 @@ const ListItem = ({ route, navigation }) => {
   const [listHeader, setlistHeader] = useState();
   const [postImage, setPostImage] = useState([]);
   const [visible, setVisible] = React.useState(false);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
   const [Indicator, setIndicator] = useState(false);
   const [imageIndex, setimageIndex] = useState();
   const [noBox, setnoBox] = useState(0);
@@ -171,6 +172,10 @@ const ListItem = ({ route, navigation }) => {
           <View style={{ flex: 0.4, alignItems: 'center' }}>
             <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '20%' }}>Created By</Text>
             <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
+          </View>
+
+          <View style={{ marginRight: '2%', flex: 0.15 }}>
+            <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
           </View>
 
         </Card>

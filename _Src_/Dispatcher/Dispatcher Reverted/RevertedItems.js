@@ -25,13 +25,7 @@ const RevertedItems = ({ route, navigation }) => {
   const [checked, setChecked] = React.useState(false);
   const [isimage, setisimage] = useState();
   const [listHeader, setlistHeader] = useState();
-  const [dialog, setdialog] = useState(false);
   const [arrImages, setarrImages] = useState([]);
-
-  const showDialog = () => setdialog(true);
-
-  const hideDialog = () => setdialog(false);
-
 
   // Api Call for items according to bill
   async function getcounterbill() {
@@ -76,29 +70,6 @@ const RevertedItems = ({ route, navigation }) => {
   }
 
   console.log("Arr Images----", arrImages)
-
-  // Resend Data to previous status 
-  async function resendCounterBill() {
-
-    let senddataapi = {
-
-      ...listHeader,
-      status: CounterBillStatus.returntopacker
-
-    }
-
-    console.log('Resenddataapi----', senddataapi);
-
-    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-    console.log("ApiRes // getcounterbill", UpdateBillData)
-
-    if (UpdateBillData.Success == true) {
-      ApiCall();
-      navigation.navigate('Dispatcher');
-    }
-
-  }
-
 
   // Post Api Call (Send to next page) 
   async function addcounterbill() {
@@ -263,17 +234,7 @@ const RevertedItems = ({ route, navigation }) => {
 
           {/* Submit button and Resend Button */}
 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-            {/* Resend */}
-            <TouchableOpacity style={{ width: '50%' }}>
-              <Button
-                style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
-                onPress={() => setdialog(true)}
-              >
-                <Text style={{ color: 'orange' }}>Resend</Text>
-              </Button>
-            </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
 
             {/* Submit */}
             <TouchableOpacity style={{ width: '50%' }}>
@@ -292,39 +253,6 @@ const RevertedItems = ({ route, navigation }) => {
         </Card>
 
       </View>
-
-      {
-        dialog ? (
-          <Portal>
-            <Dialog visible={showDialog} onDismiss={hideDialog}>
-
-              <Dialog.Title>Message</Dialog.Title>
-
-              <TextInput
-                style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
-                multiline={true}
-                onChangeText={(text) => {
-                  listHeader.message = text
-
-                  console.log('listHeader---------->', listHeader)
-                }}
-              />
-
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <Button onPress={() => {
-                  // list.map((itm) => {
-                  //   console.log('itm=======', itm);
-                  // })
-                  resendCounterBill();
-                }} >Resend</Button>
-
-                <Button onPress={hideDialog}>Exit</Button>
-              </View>
-
-            </Dialog>
-          </Portal>
-        ) : null
-      }
 
     </Provider>
   )

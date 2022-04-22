@@ -23,11 +23,10 @@ const DispatcherItem = ({ route, navigation }) => {
   const { custName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
   const [list, setlist] = useState();
-  const [checked, setChecked] = React.useState(false);
-  const [isimage, setisimage] = useState();
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
   const [arrImages, setarrImages] = useState([]);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
 
   const showDialog = () => setdialog(true);
 
@@ -149,6 +148,9 @@ const DispatcherItem = ({ route, navigation }) => {
             <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
           </View>
 
+          <View style={{ marginRight: '2%', flex: 0.15 }}>
+            <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
+          </View>
 
         </Card>
 
@@ -230,10 +232,10 @@ const DispatcherItem = ({ route, navigation }) => {
 
                     arrImages.map((img) => {
                       return (
-                        <View style={{borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
+                        <View style={{ borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
                           <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
                           {/* <Image source={{ uri: img }} style={styles.image} /> */}
-                          <Text style={{color: 'black', textAlign: 'center'}}>{img?.descn}</Text>
+                          <Text style={{ color: 'black', textAlign: 'center' }}>{img?.descn}</Text>
                         </View>
                       )
 

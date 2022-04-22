@@ -18,6 +18,7 @@ const ItemList = ({ route, navigation }) => {
   const [list, setlist] = useState();
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
 
   const { CustName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
@@ -153,9 +154,6 @@ const ItemList = ({ route, navigation }) => {
     }
     console.log("Check------>", result.length)
     if (result.length == 0) {
-      // list.map((itm) => {
-      //   console.log('itm=======', itm);
-      // })
       addcounterbill();
     }
     else {
@@ -261,7 +259,12 @@ const ItemList = ({ route, navigation }) => {
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '30%', }}>Created By</Text>
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '30%', }}>{From}</Text>
         </View>
-        {/* <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 18, marginRight: '35%', }}>{listHeader?.custDescn}</Text> */}
+
+        <View style={{ marginRight: '2%', flex: 0.15 }}>
+          <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
+        </View>
+
+
       </Card>
     );
   };
