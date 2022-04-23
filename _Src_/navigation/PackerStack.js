@@ -10,8 +10,8 @@ const PackerStack = () => {
   return (
     <Stack.Navigator>
 
-        <Stack.Screen name="PackerList" component={PackerList} options={{ headerShown: false, }} />
-        <Stack.Screen name="ListItem" component={ListItem} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
+        <Stack.Screen name="PackerList" component={PackerList} options={{ headerShown: true, title: 'Packer' }} />
+        <Stack.Screen name="ListItem" component={ListItem} options={{ headerShown: true, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#fff' }, headerTintColor: 'black', }} />
 
       </Stack.Navigator>
   )

@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView }
 import React, { useState, useEffect } from 'react';
 import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-picker';
 import { Card } from 'react-native-shadow-cards';
-import { Checkbox, Button, Divider, TextInput, Title, Provider, Portal, Dialog, Paragraph } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Title, Provider, Portal, Dialog, Paragraph, Banner } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
@@ -32,6 +32,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
   const [noSaline, setnoSaline] = useState(0);
   const [noJar, setnoJar] = useState(0);
   const [count, setcount] = useState(0);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
 
 
   const showDialog = () => setVisible(true);
@@ -183,119 +184,144 @@ const PackerRevertedItems = ({ route, navigation }) => {
 
   return (
     <Provider>
-      <View style={{ flex: 1, alignItems: 'center', padding: '3%', }}>
 
-        {/* Customer Name */}
-        <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+      <Portal>
 
-          <View style={{ flexDirection: 'row', flex: 0.9, alignItems: 'center' }}>
-            <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '10%' }}>{custName}</Text>
-          </View>
+        <View style={{ flex: 1, alignItems: 'center', padding: '3%', }}>
 
-          <View style={{ flex: 0.4, alignItems: 'center' }}>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '20%' }}>Created By</Text>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
-          </View>
+          <Banner
+            visible={VisibleMsg}
+            actions={[
+              // {
+              //   label: 'Fix it',
+              //   onPress: () => setVisible(false),
+              // },
+              // {
+              //   label: 'Learn more',
+              //   onPress: () => setVisible(false),
+              // },
+            ]}
+          >
+            {
+              listHeader?.messages[0]?.status == 'RP' ? (
+                listHeader?.messages[0]?.message
 
-          <View>
-
-          </View>
-        </Card>
-
-        <Card style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', marginBottom: '4%' }} >
-
-
-          {/* Box And Goni (input) */}
-          <View style={{ flex: 1, paddingLeft: '3%', flexDirection: 'column', justifyContent: 'space-around', }}>
-
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
-
-              <Title>Measure</Title>
-
-              {/* Camera Button */}
-              <TouchableOpacity onPress={takePhoto} style={styles.camera_btn} >
-                <MaterialCommunityIcons name={'camera'} size={26} color={'white'} />
-              </TouchableOpacity>
+              ) : null
+            }
+          </Banner>
 
 
+          {/* Customer Name */}
+          <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+
+            <View style={{ flexDirection: 'row', flex: 0.9, alignItems: 'center' }}>
+              <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '10%' }}>{custName}</Text>
             </View>
 
-            {/* <Divider /> */}
-
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '98%' }}>
-
-              {/* Box */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
-                <TextInput
-                  style={{ width: '40%', height: 35 }}
-                  keyboardType="numeric"
-                  defaultValue={listHeader?.boxes.toString()}
-                  onChangeText={(text) => {
-                    listHeader.boxes = text
-
-                    // console.log('listHeader', listHeader)
-                  }}
-                />
-              </View>
-
-              {/* Bag */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
-                <TextInput
-                  style={{ width: '40%', height: 35 }}
-                  keyboardType="numeric"
-                  defaultValue={listHeader?.noofbags.toString()}
-                  onChangeText={(text) => {
-                    listHeader.noofbags = text
-
-                    console.log('listHeader', listHeader)
-                  }}
-                />
-
-              </View>
-
+            <View style={{ flex: 0.4, alignItems: 'center' }}>
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '20%' }}>Created By</Text>
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
             </View>
 
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '80%' }}>
-
-              {/* Saline Case */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%' }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline :</Text>
-                <TextInput
-                  style={{ width: '40%', height: 35 }}
-                  keyboardType="numeric"
-                  defaultValue={listHeader?.noofsaline.toString()}
-                  onChangeText={(text) => {
-                    listHeader.noofsaline = text
-
-                    // console.log('listHeader', listHeader)
-                  }}
-                />
-              </View>
-
-              {/* Jar Case */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar :</Text>
-                <TextInput
-                  style={{ width: '40%', height: 35 }}
-                  keyboardType="numeric"
-                  defaultValue={listHeader?.noofjar.toString()}
-                  onChangeText={(text) => {
-                    listHeader.noofjar = text
-
-                    // console.log('listHeader', listHeader)
-                  }}
-                />
-              </View>
-
+            <View style={{ marginRight: '2%', flex: 0.15 }}>
+              <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
             </View>
+          </Card>
 
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '80%' }}>
+          <Card style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', marginBottom: '4%' }} >
 
-              {/* Goni */}
-              {/* 
+
+            {/* Box And Goni (input) */}
+            <View style={{ flex: 1, paddingLeft: '3%', flexDirection: 'column', justifyContent: 'space-around', }}>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
+
+                <Title>Measure</Title>
+
+                {/* Camera Button */}
+                <TouchableOpacity onPress={takePhoto} style={styles.camera_btn} >
+                  <MaterialCommunityIcons name={'camera'} size={26} color={'white'} />
+                </TouchableOpacity>
+
+
+              </View>
+
+              {/* <Divider /> */}
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '98%' }}>
+
+                {/* Box */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
+                  <TextInput
+                    style={{ width: '40%', height: 35 }}
+                    keyboardType="numeric"
+                    defaultValue={listHeader?.boxes.toString()}
+                    onChangeText={(text) => {
+                      listHeader.boxes = text
+
+                      // console.log('listHeader', listHeader)
+                    }}
+                  />
+                </View>
+
+                {/* Bag */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
+                  <TextInput
+                    style={{ width: '40%', height: 35 }}
+                    keyboardType="numeric"
+                    defaultValue={listHeader?.noofbags.toString()}
+                    onChangeText={(text) => {
+                      listHeader.noofbags = text
+
+                      console.log('listHeader', listHeader)
+                    }}
+                  />
+
+                </View>
+
+              </View>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '80%' }}>
+
+                {/* Saline Case */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline :</Text>
+                  <TextInput
+                    style={{ width: '40%', height: 35 }}
+                    keyboardType="numeric"
+                    defaultValue={listHeader?.noofsaline.toString()}
+                    onChangeText={(text) => {
+                      listHeader.noofsaline = text
+
+                      // console.log('listHeader', listHeader)
+                    }}
+                  />
+                </View>
+
+                {/* Jar Case */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar :</Text>
+                  <TextInput
+                    style={{ width: '40%', height: 35 }}
+                    keyboardType="numeric"
+                    defaultValue={listHeader?.noofjar.toString()}
+                    onChangeText={(text) => {
+                      listHeader.noofjar = text
+
+                      // console.log('listHeader', listHeader)
+                    }}
+                  />
+                </View>
+
+              </View>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '80%' }}>
+
+                {/* Goni */}
+                {/* 
               <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%' }}>
                 <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni :</Text>
                 <TextInput
@@ -308,110 +334,111 @@ const PackerRevertedItems = ({ route, navigation }) => {
                 />
               </View> */}
 
+              </View>
+
             </View>
 
-          </View>
-
-        </Card>
+          </Card>
 
 
 
-        <Card style={{ flex: 1, padding: '2%', justifyContent: 'space-around', }}>
+          <Card style={{ flex: 1, padding: '2%', justifyContent: 'space-around', }}>
 
-          <Divider />
+            <Divider />
 
-          <ScrollView >
+            <ScrollView >
 
-            {
-              arrImages != null ? (
-                <View style={styles.image_view} >
-                  {
+              {
+                arrImages != null ? (
+                  <View style={styles.image_view} >
+                    {
 
-                    arrImages.map((img, index) => {
-                      return (
-                        <>
-                          <TouchableOpacity onPress={() => {
-                            setimageIndex(index);
-                            showDialog()
-                          }}>
+                      arrImages.map((img, index) => {
+                        return (
+                          <>
+                            <TouchableOpacity onPress={() => {
+                              setimageIndex(index);
+                              showDialog()
+                            }}>
 
-                            <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
-                            {/* <Image source={{ uri: img }} style={styles.image} /> */}
-                          </TouchableOpacity>
+                              <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
+                              {/* <Image source={{ uri: img }} style={styles.image} /> */}
+                            </TouchableOpacity>
 
-                          <TextInput
-                            style={{ width: '40%', height: 35 }}
-                            defaultValue={img?.descn}
-                            onChangeText={(text) => {
-                              img.descn = text;
-                            }}
-                          />
-                        </>
-                      )
+                            <TextInput
+                              style={{ width: '40%', height: 35 }}
+                              defaultValue={img?.descn}
+                              onChangeText={(text) => {
+                                img.descn = text;
+                              }}
+                            />
+                          </>
+                        )
 
-                    })
+                      })
 
-                  }
-                </View>
-              ) : (
-                <View style={styles.image_view}>
-                  <Text>Please Click the image</Text>
-                </View>
-              )
-            }
-          </ScrollView>
+                    }
+                  </View>
+                ) : (
+                  <View style={styles.image_view}>
+                    <Text>Please Click the image</Text>
+                  </View>
+                )
+              }
+            </ScrollView>
 
-          {/* Submit button */}
-          <TouchableOpacity>
-            <Button
-              style={{ backgroundColor: 'orange', width: '40%', alignSelf: 'center', elevation: 5 }}
-              onPress={() => {
+            {/* Submit button */}
+            <TouchableOpacity>
+              <Button
+                style={{ backgroundColor: 'orange', width: '40%', alignSelf: 'center', elevation: 5 }}
+                onPress={() => {
 
-                addcounterbill();
-                // if (postImage.length > 0) {
+                  addcounterbill();
+                  // if (postImage.length > 0) {
 
-                //   // addcounterbillimages()
-                // }
-                // else {
-                //   console.log('Failed')
-                // }
+                  //   // addcounterbillimages()
+                  // }
+                  // else {
+                  //   console.log('Failed')
+                  // }
 
-              }}
-            >
-              <Text style={{ color: 'white' }}>Submit</Text>
-            </Button>
-          </TouchableOpacity>
-        </Card>
-
-
-
-        {/* Dialog */}
-        <Portal>
-          <Dialog visible={visible} onDismiss={hideDialog}>
-            <Dialog.Title>Alert</Dialog.Title>
-            <Dialog.Content>
-              <Paragraph>You Want to Delete this Image</Paragraph>
-            </Dialog.Content>
-
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <Dialog.Actions>
-
-                <Button
-                  onPress={() => { removeTodo(imageIndex), hideDialog(); }}>Done</Button>
-
-              </Dialog.Actions>
-
-              <Dialog.Actions>
-                <Button onPress={() => { setimageIndex(null), hideDialog() }}>Cancel</Button>
-              </Dialog.Actions>
-            </View>
-
-          </Dialog>
-        </Portal>
+                }}
+              >
+                <Text style={{ color: 'white' }}>Submit</Text>
+              </Button>
+            </TouchableOpacity>
+          </Card>
 
 
 
-      </View>
+          {/* Dialog */}
+          <Portal>
+            <Dialog visible={visible} onDismiss={hideDialog}>
+              <Dialog.Title>Alert</Dialog.Title>
+              <Dialog.Content>
+                <Paragraph>You Want to Delete this Image</Paragraph>
+              </Dialog.Content>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <Dialog.Actions>
+
+                  <Button
+                    onPress={() => { removeTodo(imageIndex), hideDialog(); }}>Done</Button>
+
+                </Dialog.Actions>
+
+                <Dialog.Actions>
+                  <Button onPress={() => { setimageIndex(null), hideDialog() }}>Cancel</Button>
+                </Dialog.Actions>
+              </View>
+
+            </Dialog>
+          </Portal>
+
+        </View>
+
+      </Portal>
+
     </Provider>
 
   )

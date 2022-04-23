@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, Dialog, Portal, Provider, TextInput } from 'react-native-paper';
+import { Checkbox, Button, Divider, Dialog, Portal, Provider, TextInput, Banner } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../../AppFunction';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,6 +18,7 @@ const ResendItems = ({ route, navigation }) => {
   const [list, setlist] = useState();
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
 
   const { CustName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
@@ -204,6 +205,10 @@ const ResendItems = ({ route, navigation }) => {
         <View style={{ flex: 0.4, alignItems: 'center' }}>
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '10%', }}>Created By</Text>
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '10%', }}>{From}</Text>
+        </View>
+
+        <View style={{ marginRight: '2%', flex: 0.15 }}>
+          <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
         </View>
 
 
@@ -431,33 +436,57 @@ const ResendItems = ({ route, navigation }) => {
 
   return (
     <Provider>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          // data={BillDetails}
-          data={list}
-          renderItem={renderItems}
-          showsVerticalScrollIndicator={true}
-          // onEndReached={onEndReachedHandler}
-          keyExtractor={(item) => item.recno.toString()}
-          ListHeaderComponent={ListHeader}
-        />
+      <Portal>
+        <View style={{ flex: 1 }}>
 
-        {/* Submit button */}
+          <Banner
+            visible={VisibleMsg}
+            actions={[
+              // {
+              //   label: 'Fix it',
+              //   onPress: () => setVisible(false),
+              // },
+              // {
+              //   label: 'Learn more',
+              //   onPress: () => setVisible(false),
+              // },
+            ]}
+          >
+            {
+              listHeader?.messages[0]?.status == 'RC' ? (
+                listHeader?.messages[0]?.message
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+              ) : null
+            }
+          </Banner>
 
-          <TouchableOpacity style={{ width: '50%', marginLeft: '25%' }} >
-            <Button
-              style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', }}
-              onPress={SubmitCondition}
-            >
-              <Text style={{ color: 'white' }}>Submit</Text>
-            </Button>
-          </TouchableOpacity>
+          <FlatList
+            // data={BillDetails}
+            data={list}
+            renderItem={renderItems}
+            showsVerticalScrollIndicator={true}
+            // onEndReached={onEndReachedHandler}
+            keyExtractor={(item) => item.recno.toString()}
+            ListHeaderComponent={ListHeader}
+          />
+
+          {/* Submit button */}
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+
+            <TouchableOpacity style={{ width: '50%', marginLeft: '25%' }} >
+              <Button
+                style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', }}
+                onPress={SubmitCondition}
+              >
+                <Text style={{ color: 'white' }}>Submit</Text>
+              </Button>
+            </TouchableOpacity>
+
+          </View>
 
         </View>
-
-      </View>
+      </Portal>
     </Provider>
 
 

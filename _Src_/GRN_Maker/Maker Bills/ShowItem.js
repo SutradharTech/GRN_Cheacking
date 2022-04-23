@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
@@ -10,10 +10,13 @@ import AppFunction from '../../AppFunction'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppConstants from '../../AppConstant';
 import { v4 as uuidv4 } from "uuid";
+import { Authcontext } from '../../auth/Auth';
+import CounterBillStatus from '../../CounterBillStatus';
 
 
-// console.log("item", route.params.item)
 const ShowItem = ({ route, navigation }) => {
+
+  const auth = useContext(Authcontext)
 
   const [list, setlist] = useState([]);
   const [Salebillfooter, setsalebillfooter] = useState();
@@ -35,6 +38,10 @@ const ShowItem = ({ route, navigation }) => {
     getcounterbill();
     getbatchno();
   }, [])
+
+  useEffect(() => {
+    addcounterbillforlock();
+  }, [listHeader])
 
 
   console.log("list ---> ", list)
@@ -76,16 +83,50 @@ const ShowItem = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
     setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items.map((itm) => {
 
 
-      return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
-    }));
+    if (UpdateBillData.Success) {
 
-    // if (UpdateBillData.Success == true) {
-    // }
+
+
+      setlist(UpdateBillData.Message.items.map((itm) => {
+
+
+        return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
+      }));
+
+    }
 
   }
+
+
+
+
+  async function addcounterbillforlock() {
+
+    // console.log("Api Call / Packer / addcounterbill", "listHeader:", listHeader, "status: ", "D", "packerdate:", AppFunction.getToday().dataDate, "packertime:", AppFunction.getToday().dataDate);
+    console.log("listheader-----------", listHeader)
+
+    let senddataapi = {
+
+      ...listHeader,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.maker,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      ApiCall();
+    }
+    else {
+      console.log('Failed')
+    }
+  }
+
 
   console.log("Header---", listHeader)
 
@@ -589,7 +630,12 @@ const ShowItem = ({ route, navigation }) => {
               // },
             ]}
           >
-            {/* {listHeader?.message} */}
+            {
+              listHeader?.messages[0]?.status == 'M' ? (
+                listHeader?.messages[0]?.message
+
+              ) : null
+            }
           </Banner>
 
           <FlatList

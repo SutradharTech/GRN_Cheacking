@@ -124,7 +124,7 @@ const ItemList = ({ route, navigation }) => {
     let senddataapi = {
       ...listHeader,
       refbillno: billno,
-      status: CounterBillStatus.salebill,
+      status: CounterBillStatus.complete,
       checkerdate: AppFunction.getToday().dataDate,
       checkertime: AppFunction.getTime().dataTime
     }
@@ -449,76 +449,104 @@ const ItemList = ({ route, navigation }) => {
 
   return (
     <Provider>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          // data={BillDetails}
-          data={list}
-          renderItem={renderItems}
-          showsVerticalScrollIndicator={true}
-          // onEndReached={onEndReachedHandler}
-          keyExtractor={(item) => item.recno.toString()}
-          ListHeaderComponent={ListHeader}
-        />
 
-        {/* Submit button and Resend Button */}
+      <Portal>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1 }}>
 
-          <TouchableOpacity style={{ width: '50%' }}>
-            <Button
-              style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
-              // onPress={ResendBill}
-              onPress={() => setdialog(true)}
-            >
-              <Text style={{ color: 'orange' }}>Resend</Text>
-            </Button>
-          </TouchableOpacity>
+          <Banner
+            visible={VisibleMsg}
+            actions={[
+              // {
+              //   label: 'Fix it',
+              //   onPress: () => setVisible(false),
+              // },
+              // {
+              //   label: 'Learn more',
+              //   onPress: () => setVisible(false),
+              // },
+            ]}
+          >
+            {
+              listHeader?.messages[0]?.status == 'Ch' ? (
+                listHeader?.messages[0]?.message
 
-          <TouchableOpacity style={{ width: '50%' }} >
-            <Button
-              style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', }}
-              onPress={SubmitCondition}
-            >
-              <Text style={{ color: 'white' }}>Submit</Text>
-            </Button>
-          </TouchableOpacity>
+              ) : null
+            }
+          </Banner>
+
+          <FlatList
+            // data={BillDetails}
+            data={list}
+            renderItem={renderItems}
+            showsVerticalScrollIndicator={true}
+            // onEndReached={onEndReachedHandler}
+            keyExtractor={(item) => item.recno.toString()}
+            ListHeaderComponent={ListHeader}
+          />
+
+          {/* Submit button and Resend Button */}
+
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+            <TouchableOpacity style={{ width: '50%' }}>
+              <Button
+                style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
+                // onPress={ResendBill}
+                onPress={() => setdialog(true)}
+              >
+                <Text style={{ color: 'orange' }}>Resend</Text>
+              </Button>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{ width: '50%' }} >
+              <Button
+                style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', }}
+                onPress={SubmitCondition}
+              >
+                <Text style={{ color: 'white' }}>Submit</Text>
+              </Button>
+            </TouchableOpacity>
+
+          </View>
+
+          {
+            dialog ? (
+              <Portal>
+                <Dialog visible={showDialog} onDismiss={hideDialog}>
+
+                  <Dialog.Title>Message</Dialog.Title>
+
+                  <TextInput
+                    style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
+                    multiline={true}
+                    onChangeText={(text) => {
+                      // listHeader.message = text
+
+                      console.log('listHeader---------->', listHeader)
+                    }}
+                  />
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <Button onPress={() => {
+                      // list.map((itm) => {
+                      //   console.log('itm=======', itm);
+                      // })
+                      resendCounterBill();
+                    }} >Resend</Button>
+
+                    <Button onPress={hideDialog}>Exit</Button>
+                  </View>
+
+                </Dialog>
+              </Portal>
+            ) : null
+          }
 
         </View>
 
-        {
-          dialog ? (
-            <Portal>
-              <Dialog visible={showDialog} onDismiss={hideDialog}>
+      </Portal>
 
-                <Dialog.Title>Message</Dialog.Title>
-
-                <TextInput
-                  style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
-                  multiline={true}
-                  onChangeText={(text) => {
-                    // listHeader.message = text
-
-                    console.log('listHeader---------->', listHeader)
-                  }}
-                />
-
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                  <Button onPress={() => {
-                    // list.map((itm) => {
-                    //   console.log('itm=======', itm);
-                    // })
-                    resendCounterBill();
-                  }} >Resend</Button>
-
-                  <Button onPress={hideDialog}>Exit</Button>
-                </View>
-
-              </Dialog>
-            </Portal>
-          ) : null
-        }
-
-      </View>
     </Provider>
 
 

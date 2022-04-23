@@ -16,7 +16,7 @@ resendmaker:"",
 revertedmakertochecker:"RC",
 returntopacker: "RP",
 revertedpackertoDispatcher: "RD",
-salebill: "C"
+// salebill: "C"
 
 }
 

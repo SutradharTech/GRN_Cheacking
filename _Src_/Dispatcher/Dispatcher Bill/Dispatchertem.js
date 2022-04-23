@@ -4,7 +4,7 @@ import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-pic
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Provider, Dialog, Portal, Title } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Provider, Dialog, Portal, Title, Banner } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
@@ -133,155 +133,180 @@ const DispatcherItem = ({ route, navigation }) => {
   return (
     <Provider>
 
-      <View style={{ flex: 1, alignItems: 'center', padding: '3%', }}>
+      <Portal>
 
-        {/* Customer Name & Created by*/}
-        <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+        <Banner
+          visible={VisibleMsg}
+          actions={[
+            // {
+            //   label: 'Fix it',
+            //   onPress: () => setVisible(false),
+            // },
+            // {
+            //   label: 'Learn more',
+            //   onPress: () => setVisible(false),
+            // },
+          ]}
+        >
+          {
+            listHeader?.messages[0]?.status == 'D' ? (
+              listHeader?.messages[0]?.message
 
-          <View style={{ flex: 0.9, flexDirection: 'row', alignItems: 'center' }}>
-            <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '25%' }}>{custName}</Text>
-          </View>
+            ) : null
+          }
+        </Banner>
 
-          <View style={{ flex: 0.4, alignItems: 'center' }}>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '20%' }}>Created By</Text>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
-          </View>
+        <View style={{ flex: 1, alignItems: 'center', padding: '3%', }}>
 
-          <View style={{ marginRight: '2%', flex: 0.15 }}>
-            <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
-          </View>
+          {/* Customer Name & Created by*/}
+          <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
 
-        </Card>
-
-        {/* Measure */}
-        <Card style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', marginBottom: '4%' }} >
-
-
-          {/* Box And Goni (input) */}
-          <View style={{ flex: 1, paddingLeft: '3%', flexDirection: 'column', justifyContent: 'space-around', }}>
-
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
-
-              <Title>Measure</Title>
-
+            <View style={{ flex: 0.9, flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '25%' }}>{custName}</Text>
             </View>
 
-            {/* <Divider /> */}
-
-            <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%', }}>
-
-              {/* Box */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.boxes}</Text>
-              </View>
-
-              {/* Bag */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 0.6 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofbags}</Text>
-              </View>
-
-
+            <View style={{ flex: 0.4, alignItems: 'center' }}>
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '20%' }}>Created By</Text>
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '20%' }}>{From}</Text>
             </View>
 
-            <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
-
-
-              {/* Saline Case */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline Case :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofsaline} </Text>
-              </View>
-
-              {/* Jar Case */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar Case :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofjar}</Text>
-
-              </View>
-
+            <View style={{ marginRight: '2%', flex: 0.15 }}>
+              <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
             </View>
 
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
+          </Card>
 
-              {/* Goni */}
-              {/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
+          {/* Measure */}
+          <Card style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', marginBottom: '4%' }} >
+
+
+            {/* Box And Goni (input) */}
+            <View style={{ flex: 1, paddingLeft: '3%', flexDirection: 'column', justifyContent: 'space-around', }}>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
+
+                <Title>Measure</Title>
+
+              </View>
+
+              {/* <Divider /> */}
+
+              <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%', }}>
+
+                {/* Box */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.boxes}</Text>
+                </View>
+
+                {/* Bag */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 0.6 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofbags}</Text>
+                </View>
+
+
+              </View>
+
+              <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
+
+
+                {/* Saline Case */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline Case :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofsaline} </Text>
+                </View>
+
+                {/* Jar Case */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar Case :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofjar}</Text>
+
+                </View>
+
+              </View>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
+
+                {/* Goni */}
+                {/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni :</Text>
               <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni</Text>
             </View> */}
 
+              </View>
+
+
             </View>
 
+          </Card>
 
-          </View>
+          <Card style={{ flex: 1, padding: '2%', justifyContent: 'space-around', }}>
 
-        </Card>
+            <Divider />
 
-        <Card style={{ flex: 1, padding: '2%', justifyContent: 'space-around', }}>
+            <ScrollView >
 
-          <Divider />
+              {
+                arrImages != null ? (
+                  <View style={styles.image_view} >
+                    {
 
-          <ScrollView >
+                      arrImages.map((img) => {
+                        return (
+                          <View style={{ borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
+                            <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
+                            {/* <Image source={{ uri: img }} style={styles.image} /> */}
+                            <Text style={{ color: 'black', textAlign: 'center' }}>{img?.descn}</Text>
+                          </View>
+                        )
 
-            {
-              arrImages != null ? (
-                <View style={styles.image_view} >
-                  {
+                      })
 
-                    arrImages.map((img) => {
-                      return (
-                        <View style={{ borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
-                          <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
-                          {/* <Image source={{ uri: img }} style={styles.image} /> */}
-                          <Text style={{ color: 'black', textAlign: 'center' }}>{img?.descn}</Text>
-                        </View>
-                      )
+                    }
+                  </View>
+                ) : (
+                  <View style={styles.image_view}>
+                    <Text>Please Click the image</Text>
+                  </View>
+                )
+              }
+            </ScrollView>
 
-                    })
+            {/* Submit button and Resend Button */}
 
-                  }
-                </View>
-              ) : (
-                <View style={styles.image_view}>
-                  <Text>Please Click the image</Text>
-                </View>
-              )
-            }
-          </ScrollView>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
-          {/* Submit button and Resend Button */}
+              {/* Resend */}
+              <TouchableOpacity style={{ width: '50%' }}>
+                <Button
+                  style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
+                  onPress={() => setdialog(true)}
+                >
+                  <Text style={{ color: 'orange' }}>Resend</Text>
+                </Button>
+              </TouchableOpacity>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              {/* Submit */}
+              <TouchableOpacity style={{ width: '50%' }}>
+                <Button
+                  style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', elevation: 5 }}
+                  onPress={() => {
 
-            {/* Resend */}
-            <TouchableOpacity style={{ width: '50%' }}>
-              <Button
-                style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
-                onPress={() => setdialog(true)}
-              >
-                <Text style={{ color: 'orange' }}>Resend</Text>
-              </Button>
-            </TouchableOpacity>
+                    addcounterbill();
+                  }}
+                >
+                  <Text style={{ color: 'white' }}>Submit</Text>
+                </Button>
+              </TouchableOpacity>
+            </View>
 
-            {/* Submit */}
-            <TouchableOpacity style={{ width: '50%' }}>
-              <Button
-                style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', elevation: 5 }}
-                onPress={() => {
+          </Card>
 
-                  addcounterbill();
-                }}
-              >
-                <Text style={{ color: 'white' }}>Submit</Text>
-              </Button>
-            </TouchableOpacity>
-          </View>
+        </View>
 
-        </Card>
-
-      </View>
+      </Portal>
 
       {
         dialog ? (

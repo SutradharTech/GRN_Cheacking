@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Banner, Modal } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Banner, Modal,Portal } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction';
@@ -367,36 +367,36 @@ const RevertedItems = ({ route, navigation }) => {
 
             <View style={{ ...styles.card_subViews, justifyContent: 'space-around', marginTop: '1%', flexDirection: 'row', height: 70, }}>
 
-                {/*  Qty */}
-                <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%', flex: 1 }}>
+              {/*  Qty */}
+              <View style={{ alignItems: 'center', flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginVertical: '2%', flex: 1 }}>
 
-                  <Text style={{ fontWeight: '400' }}>Quntity : </Text>
+                <Text style={{ fontWeight: '400' }}>Quntity : </Text>
 
-                  {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
-                  <TextInput
-                    placeholder={(item?.qty + item?.free).toString()}
-                    style={{ height: 30, width: 60 }}
-                    disabled={item.checked == 1 ? true : false}
-                    onChangeText={(text) => {
-                      setlist((p) => {
-                        p[index].qty = text;
-                        return [...p]
-                      })
-                      console.log('p---------->', list)
-                    }}
-                    keyboardType='number-pad'
+                {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
+                <TextInput
+                  placeholder={(item?.qty + item?.free).toString()}
+                  style={{ height: 30, width: 60 }}
+                  disabled={item.checked == 1 ? true : false}
+                  onChangeText={(text) => {
+                    setlist((p) => {
+                      p[index].qty = text;
+                      return [...p]
+                    })
+                    console.log('p---------->', list)
+                  }}
+                  keyboardType='number-pad'
 
-                  />
+                />
 
 
-                </View>
+              </View>
 
-                <View style={{ alignItems: 'center', flexDirection: 'column', width: '50%', justifyContent: 'space-around', marginVertical: '4%', flexWrap: 'nowrap', flex: 1.5 }}>
+              <View style={{ alignItems: 'center', flexDirection: 'column', width: '50%', justifyContent: 'space-around', marginVertical: '4%', flexWrap: 'nowrap', flex: 1.5 }}>
 
-                  <Text style={{ fontSize: 15, fontWeight: '500' }}>manufacturer</Text>
-                  <Text>{item.manufacturerdescn}</Text>
+                <Text style={{ fontSize: 15, fontWeight: '500' }}>manufacturer</Text>
+                <Text>{item.manufacturerdescn}</Text>
 
-                </View>
+              </View>
 
             </View>
 
@@ -515,7 +515,12 @@ const RevertedItems = ({ route, navigation }) => {
           // },
         ]}
       >
-        {/* {listHeader?.message} */}
+        {
+          listHeader?.messages[0]?.status == 'RM' ? (
+            listHeader?.messages[0]?.message
+
+          ) : null
+        }
       </Banner>
 
 
