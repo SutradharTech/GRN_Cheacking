@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Banner, Modal, Portal } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Banner, Modal, Portal, Dialog, Provider } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction';
@@ -11,9 +11,12 @@ import AppConstants from '../../AppConstant';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CounterBillStatus from '../../CounterBillStatus';
+import { Authcontext } from '../../auth/Auth';
 
-// console.log("item", route.params.item)
+
 const RevertedItems = ({ route, navigation }) => {
+
+  const auth = useContext(Authcontext)
 
   const { custName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
@@ -28,6 +31,9 @@ const RevertedItems = ({ route, navigation }) => {
   const [itemBatchList, setitemBatchList] = useState([]);
   const [filterBatch, setfilterBatch] = useState([]);
   const [isReadOnly, setisReadOnly] = useState(false);
+
+  const showDialog = () => setdialog(true);
+  const hideDialog = () => setdialog(false);
 
   const showModal = () => setmodalVisible(true);
   const hideModal = () => setmodalVisible(false);
@@ -132,6 +138,36 @@ const RevertedItems = ({ route, navigation }) => {
     }
   }
 
+
+  // Resend Data to previous status 
+  async function resendCounterBill() {
+
+    let senddataapi = {
+      ...listHeader,
+      lockedby: 0,
+      messages: [
+        {
+          msgtouserrecno: 161,
+          userrolerecno: "",
+          msg: "Hello",
+          msgstatus: ""
+        }
+      ],
+      status: "R",
+
+    }
+
+    console.log('Resenddataapi----', senddataapi);
+
+    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes // addcounterbill", UpdateBillData)
+
+    if (UpdateBillData.Success == true) {
+      ApiCall();
+      navigation.navigate('RevertedList');
+    }
+
+  }
 
 
   // Post Api Call (Send to next page) 
@@ -522,7 +558,7 @@ const RevertedItems = ({ route, navigation }) => {
                 <Checkbox
 
                   color={'orange'}
-                  disabled={item.checked == 1 ? true : false || isReadOnly ? true : false} 
+                  disabled={item.checked == 1 ? true : false || isReadOnly ? true : false}
                   // key={item.key}
                   status={list[index].attributeschecked ? 'checked' : 'unchecked'}
                   onPress={(n) => {
@@ -586,150 +622,205 @@ const RevertedItems = ({ route, navigation }) => {
 
   return (
 
-    <View style={{ flex: 1 }}>
+    <Provider>
+      <View style={{ flex: 1 }}>
 
-      <Banner
-        visible={visible}
-        actions={[
-          // {
-          //   label: 'Fix it',
-          //   onPress: () => setVisible(false),
-          // },
-          // {
-          //   label: 'Learn more',
-          //   onPress: () => setVisible(false),
-          // },
-        ]}
-      >
+        <Banner
+          visible={visible}
+          actions={[
+            // {
+            //   label: 'Fix it',
+            //   onPress: () => setVisible(false),
+            // },
+            // {
+            //   label: 'Learn more',
+            //   onPress: () => setVisible(false),
+            // },
+          ]}
+        >
+          {
+            listHeader?.messages[0]?.status == 'RM' ? (
+              listHeader?.messages[0]?.message
+
+            ) : null
+          }
+        </Banner>
+
+
+        <FlatList
+          // data={BillDetails}
+          data={list}
+          renderItem={renderItems}
+          showsVerticalScrollIndicator={true}
+          // onEndReached={onEndReachedHandler}
+          keyExtractor={(item) => item.recno.toString()}
+          ListHeaderComponent={ListHeader}
+
+        />
+
+
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'ghostwhite', paddingVertical: '1%' }}>
+
+          {/*  Revert Bill  */}
+          <TouchableOpacity>
+            <Button
+              style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+              disabled={isReadOnly ? true : false}
+              onPress={() => setdialog(true)}
+            >
+              <Text style={{ color: 'orange' }}>Revert</Text>
+            </Button>
+          </TouchableOpacity>
+
+
+          {/* Submit button */}
+          <TouchableOpacity>
+            <Button
+              style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+              disabled={isReadOnly ? true : false}
+              onPress={SubmitCondition}
+            >
+              <Text style={{ color: 'white' }}>Submit</Text>
+            </Button>
+          </TouchableOpacity>
+
+        </View>
+
+
+        <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle} style={{ height: "75%" }}>
+          <ScrollView>
+            <View style={{ flex: 1 }}>
+
+              <View style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                  {`Batch:  `}
+                </Text>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                  Exp Date:
+                </Text>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                  stock:
+                </Text>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
+                  {`Quantity:  `}
+                </Text>
+              </View>
+
+              {
+                filterBatch.map((batch, index) => {
+
+                  return (
+                    <View key={batch.itembatchno} style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
+                      <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                        {batch.itembatchno}
+                      </Text>
+                      <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                        {batch.expdate}
+                      </Text>
+                      <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
+                        {batch.totalstock}
+                      </Text>
+                      <TextInput
+                        style={styles.searchInput}
+                        placeholder={'Qty'}
+                        keyboardType='numeric'
+                        onChangeText={(text) => {
+                          setfilterBatch((p) => {
+                            p[index].qty = text;
+
+                            return [...p];
+
+                          })
+                        }}
+
+                      // onChangeText={textChangeHandler}
+                      />
+
+
+
+                    </View>
+                  )
+                })
+              }
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Pending</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{pending}</Text>
+                </View>
+
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Projected</Text>
+                  <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{itemQty}</Text>
+                </View>
+
+                {/*  Submit Bill  */}
+                <TouchableOpacity>
+                  {
+                    pending == 0 ?
+                      <>
+                        <Button
+                          style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+                          onPress={sendBatchCondition}
+                        >
+                          <Text style={{ color: 'white' }}>Submit</Text>
+                        </Button>
+                      </>
+                      :
+                      (null)
+                  }
+
+                </TouchableOpacity>
+              </View>
+
+            </View>
+          </ScrollView>
+        </Modal>
+
+
         {
-          listHeader?.messages[0]?.status == 'RM' ? (
-            listHeader?.messages[0]?.message
+          dialog ? (
+            <Portal>
+              <Dialog visible={showDialog} onDismiss={hideDialog} style={{ height: '40%', justifyContent: 'space-between' }}>
 
+                <View>
+
+                  <Dialog.Title>Message</Dialog.Title>
+
+                  <TextInput
+                    style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
+                    // multiline={true}
+                    onChangeText={(text) => {
+
+                      setMessage(text);
+                      // listHeader.messages.msg = text,
+
+
+                      console.log('listHeader---------->', listHeader)
+                    }}
+                  />
+
+                </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                  <Button onPress={() => {
+                    resendCounterBill();
+                  }} >Resend</Button>
+
+                  <Button onPress={hideDialog}>Exit</Button>
+                </View>
+
+              </Dialog>
+            </Portal>
           ) : null
         }
-      </Banner>
 
 
-      <FlatList
-        // data={BillDetails}
-        data={list}
-        renderItem={renderItems}
-        showsVerticalScrollIndicator={true}
-        // onEndReached={onEndReachedHandler}
-        keyExtractor={(item) => item.recno.toString()}
-        ListHeaderComponent={ListHeader}
-
-      />
-
-      {/* Submit button */}
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'ghostwhite', paddingVertical: '1%' }}>
-
-        <TouchableOpacity>
-          <Button
-            style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
-            disabled={isReadOnly ? true : false}
-            onPress={SubmitCondition}
-          >
-            <Text style={{ color: 'white' }}>Submit</Text>
-          </Button>
-        </TouchableOpacity>
 
       </View>
-
-
-      <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle} style={{ height: "75%" }}>
-        <ScrollView>
-          <View style={{ flex: 1 }}>
-
-            <View style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
-              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
-                {`Batch:  `}
-              </Text>
-              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
-                Exp Date:
-              </Text>
-              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
-                stock:
-              </Text>
-              <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>
-                {`Quantity:  `}
-              </Text>
-            </View>
-
-            {
-              filterBatch.map((batch, index) => {
-
-                return (
-                  <View key={batch.itembatchno} style={{ justifyContent: 'space-around', alignItems: 'center', flexDirection: 'row', margin: 10 }}>
-                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
-                      {batch.itembatchno}
-                    </Text>
-                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
-                      {batch.expdate}
-                    </Text>
-                    <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>
-                      {batch.totalstock}
-                    </Text>
-                    <TextInput
-                      style={styles.searchInput}
-                      placeholder={'Qty'}
-                      keyboardType='numeric'
-                      onChangeText={(text) => {
-                        setfilterBatch((p) => {
-                          p[index].qty = text;
-
-                          return [...p];
-
-                        })
-                      }}
-
-                    // onChangeText={textChangeHandler}
-                    />
-
-
-
-                  </View>
-                )
-              })
-            }
-
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-
-              <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Pending</Text>
-                <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{pending}</Text>
-              </View>
-
-              <View style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 14, fontWeight: 'bold', color: "black" }}>Projected</Text>
-                <Text style={{ fontSize: 14, fontWeight: 'normal', color: "black" }}>{itemQty}</Text>
-              </View>
-
-              {/*  Submit Bill  */}
-              <TouchableOpacity>
-                {
-                  pending == 0 ?
-                    <>
-                      <Button
-                        style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
-                        onPress={sendBatchCondition}
-                      >
-                        <Text style={{ color: 'white' }}>Submit</Text>
-                      </Button>
-                    </>
-                    :
-                    (null)
-                }
-
-              </TouchableOpacity>
-            </View>
-
-          </View>
-        </ScrollView>
-      </Modal>
-
-    </View>
+    </Provider>
   )
 }
 

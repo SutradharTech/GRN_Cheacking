@@ -102,6 +102,37 @@ const ResendItems = ({ route, navigation }) => {
 
 
 
+  // Resend Data to previous status 
+  async function resendCounterBill() {
+
+    let senddataapi = {
+
+      ...listHeader,
+      lockedby: 0,
+      messages: [
+        {
+          msgtouserrecno: 161,
+          userrolerecno: "",
+          msg: "Hello",
+          msgstatus: ""
+        }
+      ],
+      status: CounterBillStatus.checkertomaker
+
+    }
+
+    console.log('Resenddataapi----', senddataapi);
+
+    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes // getcounterbill", UpdateBillData)
+
+    if (UpdateBillData.Success == true) {
+      ApiCall();
+      navigation.navigate('MakerResendBill');
+    }
+
+  }
+
 
 
   // Post Api Call (Send to next page) 
@@ -517,9 +548,21 @@ const ResendItems = ({ route, navigation }) => {
             ListHeaderComponent={ListHeader}
           />
 
-          {/* Submit button */}
+          {/* Submit button and Resend Button */}
 
           <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+
+            <TouchableOpacity style={{ width: '50%' }}>
+              <Button
+                style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
+                disabled={isReadOnly ? true : false}
+                onPress={() => setdialog(true)}
+              >
+                <Text style={{ color: 'orange' }}>Resend</Text>
+              </Button>
+            </TouchableOpacity>
+
+
 
             <TouchableOpacity style={{ width: '50%', marginLeft: '25%' }} >
               <Button
@@ -532,6 +575,37 @@ const ResendItems = ({ route, navigation }) => {
             </TouchableOpacity>
 
           </View>
+
+          {
+            dialog ? (
+              <Portal>
+                <Dialog visible={showDialog} onDismiss={hideDialog}>
+
+                  <Dialog.Title>Message</Dialog.Title>
+
+                  <TextInput
+                    style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
+                    multiline={true}
+                    onChangeText={(text) => {
+                      // listHeader.message = text
+
+                      console.log('listHeader---------->', listHeader)
+                    }}
+                  />
+
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <Button onPress={() => {
+                      resendCounterBill();
+                    }} >Resend</Button>
+
+                    <Button onPress={hideDialog}>Exit</Button>
+                  </View>
+
+                </Dialog>
+              </Portal>
+            ) : null
+          }
+
 
         </View>
       </Portal>
