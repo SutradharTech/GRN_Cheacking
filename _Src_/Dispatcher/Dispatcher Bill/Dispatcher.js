@@ -7,6 +7,7 @@ import { Card } from 'react-native-shadow-cards';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AppConstants from '../../AppConstant';
+import CounterBillStatus from '../../CounterBillStatus';
 
 const Dispatcher = ({ navigation }) => {
 
@@ -38,8 +39,6 @@ const Dispatcher = ({ navigation }) => {
         setfilterBillDetais(FilterBillData.data.Message)
 
     }
-
-
 
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
@@ -93,7 +92,9 @@ const Dispatcher = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('DispatcherItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderRadius: 10, borderColor: 'orange', borderTopWidth: 10 }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('DispatcherItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })}
+                            style={{ flex: 1, borderRadius: 10, borderColor: 'orange', borderTopWidth: 10 }}
+                        >
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>

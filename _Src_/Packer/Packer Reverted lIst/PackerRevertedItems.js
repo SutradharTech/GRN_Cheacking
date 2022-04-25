@@ -33,6 +33,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
   const [noJar, setnoJar] = useState(0);
   const [count, setcount] = useState(0);
   const [VisibleMsg, setVisibleMsg] = useState(true);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
 
   const showDialog = () => setVisible(true);
@@ -54,12 +55,58 @@ const PackerRevertedItems = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     // console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items);
-    // if (UpdateBillData.Success == true) {
-    // }
+    if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
+      setlist(UpdateBillData.Message.items);
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+
+    }
 
   }
+
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.returntopacker,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
 
 
   // Get Image (According to Billno) 
@@ -116,6 +163,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
+      lockedby: 0,
       status: CounterBillStatus.revertedpackertoDispatcher,
       packerdate: AppFunction.getToday().dataDate,
       packertime: AppFunction.getTime().dataTime,
@@ -240,7 +288,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
                 <Title>Measure</Title>
 
                 {/* Camera Button */}
-                <TouchableOpacity onPress={takePhoto} style={styles.camera_btn} >
+                <TouchableOpacity disabled={isReadOnly ? true : false} onPress={takePhoto} style={styles.camera_btn} >
                   <MaterialCommunityIcons name={'camera'} size={26} color={'white'} />
                 </TouchableOpacity>
 
@@ -256,6 +304,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     defaultValue={listHeader?.boxes.toString()}
                     onChangeText={(text) => {
@@ -271,6 +320,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     defaultValue={listHeader?.noofbags.toString()}
                     onChangeText={(text) => {
@@ -291,6 +341,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     defaultValue={listHeader?.noofsaline.toString()}
                     onChangeText={(text) => {
@@ -306,6 +357,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     defaultValue={listHeader?.noofjar.toString()}
                     onChangeText={(text) => {
@@ -315,24 +367,6 @@ const PackerRevertedItems = ({ route, navigation }) => {
                     }}
                   />
                 </View>
-
-              </View>
-
-              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '80%' }}>
-
-                {/* Goni */}
-                {/* 
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%' }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni :</Text>
-                <TextInput
-                  style={{ width: '40%', height: 35 }}
-                // onChangeText={(text) => {
-                //   listHeader.boxes = text
-
-                //   // console.log('listHeader', listHeader)
-                // }}
-                />
-              </View> */}
 
               </View>
 
@@ -356,7 +390,7 @@ const PackerRevertedItems = ({ route, navigation }) => {
                       arrImages.map((img, index) => {
                         return (
                           <>
-                            <TouchableOpacity onPress={() => {
+                            <TouchableOpacity disabled={isReadOnly ? true : false} onPress={() => {
                               setimageIndex(index);
                               showDialog()
                             }}>
@@ -391,17 +425,10 @@ const PackerRevertedItems = ({ route, navigation }) => {
             <TouchableOpacity>
               <Button
                 style={{ backgroundColor: 'orange', width: '40%', alignSelf: 'center', elevation: 5 }}
+                disabled={isReadOnly ? true : false}
                 onPress={() => {
 
                   addcounterbill();
-                  // if (postImage.length > 0) {
-
-                  //   // addcounterbillimages()
-                  // }
-                  // else {
-                  //   console.log('Failed')
-                  // }
-
                 }}
               >
                 <Text style={{ color: 'white' }}>Submit</Text>

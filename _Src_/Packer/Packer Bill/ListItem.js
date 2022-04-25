@@ -8,8 +8,12 @@ import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CounterBillStatus from '../../CounterBillStatus'
+import { useContext } from 'react';
+import { Authcontext } from '../../auth/Auth';
 
 const ListItem = ({ route, navigation }) => {
+
+  const auth = useContext(Authcontext)
 
   useEffect(() => {
     getcounterbill();
@@ -21,6 +25,7 @@ const ListItem = ({ route, navigation }) => {
   const [list, setlist] = useState();
   const [checked, setChecked] = React.useState(false);
   const [isimage, setisimage] = useState([]);
+  const [isReadOnly, setisReadOnly] = useState(false);
   const [listHeader, setlistHeader] = useState();
   const [postImage, setPostImage] = useState([]);
   const [visible, setVisible] = React.useState(false);
@@ -53,10 +58,30 @@ const ListItem = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     // console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items);
-    // if (UpdateBillData.Success == true) {
-    // }
+
+    if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
+      setlist(UpdateBillData.Message.items);
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if(UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno ) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+
+
+    }
 
   }
 
@@ -68,6 +93,7 @@ const ListItem = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
+      lockedby: 0,
       status: CounterBillStatus.disptcher,
       packerdate: AppFunction.getToday().dataDate,
       packertime: AppFunction.getTime().dataTime,
@@ -113,10 +139,34 @@ const ListItem = ({ route, navigation }) => {
   }
 
 
-  const totalImage = Number(noBox) + Number(noBag) + Number(noSaline) + Number(noJar);
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
 
-  // console.log("totalImage", totalImage);
-  // console.log("count---->", count)
+    console.log("Api Call /addcounterbill/", "senddata",senddata, "lockedby:",auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker  )
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.packer,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
+
+  const totalImage = Number(noBox) + Number(noBag) + Number(noSaline) + Number(noJar);
 
   // Taking Photo (function)
   const takePhoto = () => {
@@ -217,6 +267,7 @@ const ListItem = ({ route, navigation }) => {
                 <TouchableOpacity
                   onPress={takePhoto}
                   style={styles.camera_btn}
+                  disabled={isReadOnly ? true : false}
                 >
                   <MaterialCommunityIcons name={'camera'} size={26} color={'white'} />
                 </TouchableOpacity>
@@ -233,6 +284,7 @@ const ListItem = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     onChangeText={(text) => {
                       setnoBox(text);
@@ -248,6 +300,7 @@ const ListItem = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     onChangeText={(text) => {
                       setnoBag(text);
@@ -266,6 +319,7 @@ const ListItem = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline :</Text>
                   <TextInput
                     style={{ width: '35%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     onChangeText={(text) => {
                       setnoSaline(text)
@@ -281,6 +335,7 @@ const ListItem = ({ route, navigation }) => {
                   <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar :</Text>
                   <TextInput
                     style={{ width: '40%', height: 35 }}
+                    disabled={isReadOnly ? true : false}
                     keyboardType="numeric"
                     onChangeText={(text) => {
                       setnoJar(text)
@@ -292,25 +347,6 @@ const ListItem = ({ route, navigation }) => {
                 </View>
 
               </View>
-
-              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '80%' }}>
-
-                {/* Goni */}
-                {/* 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%' }}>
-              <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni :</Text>
-              <TextInput
-                style={{ width: '40%', height: 35 }}
-              // onChangeText={(text) => {
-              //   listHeader.boxes = text
-
-              //   // console.log('listHeader', listHeader)
-              // }}
-              />
-            </View> */}
-
-              </View>
-
 
             </View>
 
@@ -366,6 +402,7 @@ const ListItem = ({ route, navigation }) => {
             <TouchableOpacity>
               <Button
                 style={{ backgroundColor: 'orange', width: '40%', alignSelf: 'center', elevation: 5 }}
+                disabled={isReadOnly ? true : false}
                 onPress={() => {
 
                   if (postImage.length > 0) {

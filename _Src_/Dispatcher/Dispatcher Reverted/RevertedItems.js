@@ -9,6 +9,7 @@ import axios from 'axios';
 import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CounterBillStatus from '../../CounterBillStatus';
 
 // console.log("item", route.params.item)
 const RevertedItems = ({ route, navigation }) => {
@@ -27,6 +28,7 @@ const RevertedItems = ({ route, navigation }) => {
   const [listHeader, setlistHeader] = useState();
   const [arrImages, setarrImages] = useState([]);
   const [VisibleMsg, setVisibleMsg] = useState(true);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
   // Api Call for items according to bill
   async function getcounterbill() {
@@ -42,12 +44,58 @@ const RevertedItems = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
     if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
       setlist(UpdateBillData.Message.items);
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+
+      }
     }
 
   }
+
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.revertedpackertoDispatcher,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
+
 
   // Get Image (According to Billno) 
   async function getcounterbillimages() {
@@ -80,7 +128,7 @@ const RevertedItems = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
-      status: "T",
+      status: CounterBillStatus.transporter,
       dispatchdate: AppFunction.getToday().dataDate,
       dispatchtime: AppFunction.getTime().dataTime
 
@@ -100,22 +148,6 @@ const RevertedItems = ({ route, navigation }) => {
     }
   }
 
-  console.log("list ---> ", list)
-
-  const takePhoto = () => {   // Taking Photo (function) 
-
-    ImagePicker.openCamera({
-      multiple: true,
-      width: 300,
-      height: 400,
-      cropping: true,
-    }).then(image => {
-      console.log('image=====', image.path);
-
-      setisimage(image.path);
-
-    });
-  };
 
   return (
     <Provider>
@@ -268,6 +300,7 @@ const RevertedItems = ({ route, navigation }) => {
               <TouchableOpacity style={{ width: '50%' }}>
                 <Button
                   style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', elevation: 5 }}
+                  disabled={isReadOnly ? true : false}
                   onPress={() => {
 
                     addcounterbill();

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Banner, Modal,Portal } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Banner, Modal, Portal } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction';
@@ -27,6 +27,7 @@ const RevertedItems = ({ route, navigation }) => {
   const [itemQty, setitemQty] = useState();
   const [itemBatchList, setitemBatchList] = useState([]);
   const [filterBatch, setfilterBatch] = useState([]);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
   const showModal = () => setmodalVisible(true);
   const hideModal = () => setmodalVisible(false);
@@ -76,14 +77,62 @@ const RevertedItems = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message.items)
 
     setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items);
 
-    // if (UpdateBillData.Success == true) {
-    // }
+    if (UpdateBillData.Success == true) {
+
+
+      setlist(UpdateBillData.Message.items.map((itm) => {
+
+
+        return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
+      }));
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+    }
 
   }
 
-  console.log('listHeader----', listHeader);
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.checkertomaker,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
 
   // Post Api Call (Send to next page) 
   async function addcounterbill() {
@@ -92,6 +141,7 @@ const RevertedItems = ({ route, navigation }) => {
 
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       items: list,
       status: CounterBillStatus.revertedmakertochecker,
       makerdate: AppFunction.getToday().dataDate,
@@ -290,6 +340,9 @@ const RevertedItems = ({ route, navigation }) => {
       setfilterBatch(res);
     }
 
+
+    let totalQty = Number(item?.qty) + Number(item?.free);
+
     console.log("filter Batch----", filterBatch);
 
 
@@ -319,7 +372,7 @@ const RevertedItems = ({ route, navigation }) => {
 
                     color={'dodgerblue'}
                     // key={item.key}
-                    disabled={item.checked == 1 ? true : false}
+                    disabled={item.checked == 1 ? true : false || isReadOnly ? true : false}
                     status={list[index].picked ? 'checked' : 'unchecked'}
                     onPress={(n) => {
 
@@ -373,7 +426,7 @@ const RevertedItems = ({ route, navigation }) => {
                 <Text style={{ fontWeight: '400' }}>Quntity : </Text>
 
                 {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
-                <TextInput
+                {/* <TextInput
                   placeholder={(item?.qty + item?.free).toString()}
                   style={{ height: 30, width: 60 }}
                   disabled={item.checked == 1 ? true : false}
@@ -382,6 +435,38 @@ const RevertedItems = ({ route, navigation }) => {
                       p[index].qty = text;
                       return [...p]
                     })
+                    console.log('p---------->', list)
+                  }}
+                  keyboardType='number-pad'
+
+                /> */}
+
+                <TextInput
+                  value={totalQty == 0 ? "" : totalQty.toString()}
+                  style={{ height: 30, width: 50 }}
+                  disabled={isReadOnly ? true : false}
+                  onChangeText={(text) => {
+
+                    try {
+
+                      if (item.totalqty >= text) {
+
+                        setlist((p) => {
+
+                          p[index].qty = Number(text) - Number(item.free);
+                          return [...p]
+                        })
+                      }
+                      else {
+
+                        alert("You Cannot add more qty !!")
+
+                      }
+
+                    } catch (error) {
+                      console.log(error);
+                    }
+
                     console.log('p---------->', list)
                   }}
                   keyboardType='number-pad'
@@ -437,7 +522,7 @@ const RevertedItems = ({ route, navigation }) => {
                 <Checkbox
 
                   color={'orange'}
-                  disabled={item.checked == 1 ? true : false}
+                  disabled={item.checked == 1 ? true : false || isReadOnly ? true : false} 
                   // key={item.key}
                   status={list[index].attributeschecked ? 'checked' : 'unchecked'}
                   onPress={(n) => {
@@ -466,6 +551,7 @@ const RevertedItems = ({ route, navigation }) => {
                   <TouchableOpacity>
                     <Button
                       style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                      disabled={isReadOnly ? true : false}
                       onPress={() => { filterBatchfun(item.itemrecno, item.qty), showModal() }}
                     >
                       <Text style={{ color: 'orange' }}>Add Batch</Text>
@@ -542,6 +628,7 @@ const RevertedItems = ({ route, navigation }) => {
         <TouchableOpacity>
           <Button
             style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+            disabled={isReadOnly ? true : false}
             onPress={SubmitCondition}
           >
             <Text style={{ color: 'white' }}>Submit</Text>

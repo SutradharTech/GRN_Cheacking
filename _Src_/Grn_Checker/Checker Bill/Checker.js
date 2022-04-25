@@ -28,11 +28,12 @@ const Checker = ({ navigation }) => {
 
         const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);
         console.log("FilterBillData", FilterBillData.data.Message)
-        
+
         setfilterBillDetais(FilterBillData.data.Message);
 
         setRefreshing(false);
     }
+
 
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
@@ -64,18 +65,9 @@ const Checker = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ItemList', { CustName: item.custdescn, From: item.userroledescn,billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 8, borderColor: 'orange', borderRadius: 18, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ItemList', { CustName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })}
+                            style={{ flex: 1, borderTopWidth: 8, borderColor: 'orange', borderRadius: 18, }}>
 
-                            {/* <View style={{ flex: 1, flexDirection: 'row' }}> */}
-
-                            {/* <View style={{ flex: 1 }}>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Date: {showDate_ddmmyy(item.trdate)} </Text>
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text>Bill No. : {item.billno} </Text>
-                                    </View>
-                                </View> */}
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
                             </View>

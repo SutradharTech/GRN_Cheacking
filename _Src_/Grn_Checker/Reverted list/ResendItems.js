@@ -19,6 +19,7 @@ const ResendItems = ({ route, navigation }) => {
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
   const [VisibleMsg, setVisibleMsg] = useState(true);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
   const { CustName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
@@ -48,38 +49,59 @@ const ResendItems = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items);
 
-    // if (UpdateBillData.Success == true) {
-    // }
-    // else {
-    //   alert('Response is Failed');
-    // }
+    if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
+      setlist(UpdateBillData.Message.items);
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+    }
+
   }
 
 
-  // // Resend Data to previous status 
-  // async function resendCounterBill() {
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
 
-  //   let senddataapi = {
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
 
-  //     ...listHeader,
-  //     status: "RM"
+    let senddataapi = {
 
-  //   }
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.revertedmakertochecker,
+    }
 
-  //   console.log('Resenddataapi----', senddataapi);
+    console.log('senddataapi----', senddataapi);
 
-  //   const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-  //   console.log("ApiRes // getcounterbill", UpdateBillData)
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
 
-  //   if (UpdateBillData.Success == true) {
-  //     ApiCall();
-  //     navigation.navigate('Checker');
-  //   }
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
 
-  // }
+
+
 
 
   // Post Api Call (Send to next page) 
@@ -89,6 +111,7 @@ const ResendItems = ({ route, navigation }) => {
 
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       messages: [],
       status: CounterBillStatus.packer,
       checkerdate: AppFunction.getToday().dataDate,
@@ -99,6 +122,31 @@ const ResendItems = ({ route, navigation }) => {
 
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
     console.log("ApiRes // getcounterbill", UpdateBillData)
+
+    if (UpdateBillData.Success == true) {
+      addSaleBillAll();
+    }
+
+  }
+
+
+  // Post Api Call (Send to next page) 
+  async function addSaleBillAll() {
+
+    console.log("Api Call / addSaleBillAll /", "listHeader:", listHeader, "status:", "C", "checkerdate: ", AppFunction.getToday().dataDate, "checkertime: ", AppFunction.getTime().dataTime)
+
+    let senddataapi = {
+      ...listHeader,
+      refbillno: billno,
+      status: CounterBillStatus.complete,
+      checkerdate: AppFunction.getToday().dataDate,
+      checkertime: AppFunction.getTime().dataTime
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addSaleBillAll/', senddataapi);
+    console.log("ApiRes // addSaleBillAll", UpdateBillData)
 
     if (UpdateBillData.Success == true) {
       ApiCall();
@@ -117,9 +165,6 @@ const ResendItems = ({ route, navigation }) => {
     }
     console.log("Check------>", result.length)
     if (result.length == 0) {
-      // list.map((itm) => {
-      //   console.log('itm=======', itm);
-      // })
       addcounterbill();
     }
     else {
@@ -241,6 +286,7 @@ const ResendItems = ({ route, navigation }) => {
                     color={'dodgerblue'}
                     // key={item.key}
                     status={list[index].checked ? 'checked' : 'unchecked'}
+                    disabled={isReadOnly ? true : false}
                     onPress={(n) => {
                       // console.log('n==>', n)
                       setlist((p) => {
@@ -380,6 +426,7 @@ const ResendItems = ({ route, navigation }) => {
                   color={'orange'}
                   // key={item.key}
                   status={item.attributescheckedbychecker ? 'checked' : 'unchecked'}
+                  disabled={isReadOnly ? true : false}
                   onPress={(n) => {
                     // console.log('n==>', n)
                     setlist((p) => {
@@ -477,6 +524,7 @@ const ResendItems = ({ route, navigation }) => {
             <TouchableOpacity style={{ width: '50%', marginLeft: '25%' }} >
               <Button
                 style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', }}
+                disabled={isReadOnly ? true : false}
                 onPress={SubmitCondition}
               >
                 <Text style={{ color: 'white' }}>Submit</Text>

@@ -7,6 +7,7 @@ import { Card } from 'react-native-shadow-cards';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AppConstants from '../../AppConstant';
+import CounterBillStatus from '../../CounterBillStatus';
 
 const RevertedList = ({ navigation }) => {
 
@@ -29,7 +30,7 @@ const RevertedList = ({ navigation }) => {
 
         var senddataapi = {
             "domainrecno": 508,
-            "status": "RD"
+            "status": CounterBillStatus.revertedpackertoDispatcher
         }
 
         const FilterBillData = await axios.post(AppConstants.APIurl2 + 'getcounterbillall/', senddataapi);

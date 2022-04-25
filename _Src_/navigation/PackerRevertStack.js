@@ -9,8 +9,8 @@ const PackerRevertStack = () => {
   return (
     <Stack.Navigator>
 
-        <Stack.Screen name="PackerReverted" component={PackerReverted} options={{ headerShown: false, }} />
-        <Stack.Screen name="PackerRevertedItems" component={PackerRevertedItems} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
+        <Stack.Screen name="PackerReverted" component={PackerReverted} options={{ headerShown: true, title: 'Packer Reverted' }} />
+        <Stack.Screen name="PackerRevertedItems" component={PackerRevertedItems} options={{ headerShown: true, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#fff' }, headerTintColor: 'black', }} />
 
       </Stack.Navigator>
   )

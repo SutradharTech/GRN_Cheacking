@@ -22,6 +22,7 @@ const ShowItem = ({ route, navigation }) => {
   const [Salebillfooter, setsalebillfooter] = useState();
   const [flag, setflag] = useState(false);
   const [listHeader, setlistHeader] = useState();
+  const [isReadOnly, setisReadOnly] = useState(false);
   const [dialog, setdialog] = useState(false);
   const [itemBatchList, setitemBatchList] = useState([]);
   const [visible, setVisible] = useState(false);
@@ -38,11 +39,6 @@ const ShowItem = ({ route, navigation }) => {
     getcounterbill();
     getbatchno();
   }, [])
-
-  useEffect(() => {
-    addcounterbillforlock();
-  }, [listHeader])
-
 
   console.log("list ---> ", list)
 
@@ -95,21 +91,37 @@ const ShowItem = ({ route, navigation }) => {
         return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
       }));
 
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+
     }
 
   }
 
 
 
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
 
-  async function addcounterbillforlock() {
-
-    // console.log("Api Call / Packer / addcounterbill", "listHeader:", listHeader, "status: ", "D", "packerdate:", AppFunction.getToday().dataDate, "packertime:", AppFunction.getToday().dataDate);
-    console.log("listheader-----------", listHeader)
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
 
     let senddataapi = {
 
-      ...listHeader,
+      ...senddata,
       lockedby: auth?.state?.userdata?.recno,
       status: CounterBillStatus.maker,
     }
@@ -120,12 +132,13 @@ const ShowItem = ({ route, navigation }) => {
     console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
 
     if (res.data.Success == true) {
-      ApiCall();
+      console.log("Bill locked Successfully");
     }
     else {
-      console.log('Failed')
+      console.log('Failed to lock bill')
     }
   }
+
 
 
   console.log("Header---", listHeader)
@@ -154,6 +167,7 @@ const ShowItem = ({ route, navigation }) => {
 
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       messages: [
         {
           msgtouserrecno: 161,
@@ -185,6 +199,7 @@ const ShowItem = ({ route, navigation }) => {
     console.log("Api Call / addcounterbill /", "listHeader:", listHeader, "makerDate:", AppFunction.getToday().dataDate, "makerTime:", AppFunction.getTime().dataTime, "status:", 'C');
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       items: list,
       messages: [],
       status: "Ch",
@@ -304,9 +319,7 @@ const ShowItem = ({ route, navigation }) => {
     }
     console.log("Check------>", result.length)
     if (result.length == 0) {
-      // list.map((itm) => {
-      //   console.log('itm=======', itm);
-      // })
+
       addcounterbill();
     }
     else {
@@ -358,7 +371,9 @@ const ShowItem = ({ route, navigation }) => {
         </View>
 
         <View style={{ marginRight: '2%', flex: 0.15 }}>
+
           <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
+
         </View>
 
       </Card>
@@ -384,11 +399,7 @@ const ShowItem = ({ route, navigation }) => {
       setfilterBatch(res);
     }
 
-    // console.log("filter Batch----", filterBatch);
-
     let totalQty = Number(item?.qty) + Number(item?.free);
-
-    // console.log("Qty, free", item.qty, item.free)
 
 
     return (
@@ -416,6 +427,7 @@ const ShowItem = ({ route, navigation }) => {
                     color={'dodgerblue'}
                     // key={item.key}
                     status={list[index].picked ? 'checked' : 'unchecked'}
+                    disabled={isReadOnly ? true : false}
                     onPress={(n) => {
                       // console.log('n==>', n)
                       setlist((p) => {
@@ -472,6 +484,7 @@ const ShowItem = ({ route, navigation }) => {
                     <TextInput
                       value={totalQty == 0 ? "" : totalQty.toString()}
                       style={{ height: 30, width: 50 }}
+                      disabled={isReadOnly ? true : false}
                       onChangeText={(text) => {
 
                         try {
@@ -552,6 +565,7 @@ const ShowItem = ({ route, navigation }) => {
                   color={'orange'}
                   // key={item.key}
                   status={item.attributescheckedbymaker ? 'checked' : 'unchecked'}
+                  disabled={isReadOnly ? true : false}
                   onPress={(n) => {
                     // console.log('n==>', n)
                     setlist((p) => {
@@ -575,6 +589,7 @@ const ShowItem = ({ route, navigation }) => {
               <TouchableOpacity>
                 <Button
                   style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                  disabled={isReadOnly ? true : false}
                   onPress={() => { filterBatchfun(item.itemrecno, item.qty), showModal() }}
                 >
                   <Text style={{ color: 'orange' }}>Add Batch</Text>
@@ -657,6 +672,7 @@ const ShowItem = ({ route, navigation }) => {
             <TouchableOpacity>
               <Button
                 style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                disabled={isReadOnly ? true : false}
                 onPress={() => setdialog(true)}
               >
                 <Text style={{ color: 'orange' }}>Revert</Text>
@@ -668,6 +684,7 @@ const ShowItem = ({ route, navigation }) => {
             <TouchableOpacity>
               <Button
                 style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+                disabled={isReadOnly ? true : false}
                 onPress={SubmitCondition}
               >
                 <Text style={{ color: 'white' }}>Submit</Text>

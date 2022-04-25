@@ -1,24 +1,28 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Pressable } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, Dialog, Portal, Provider, TextInput } from 'react-native-paper';
+import { Checkbox, Button, Divider, Dialog, Portal, Provider, TextInput, Banner } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../../AppFunction';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { color } from 'react-native-reanimated';
 import AppConstants from '../../AppConstant';
 import CounterBillStatus from '../../CounterBillStatus';
+import { Authcontext } from '../../auth/Auth';
 
 
 // console.log("item", route.params.item)
 const ItemList = ({ route, navigation }) => {
 
+  const auth = useContext(Authcontext);
+
   const [list, setlist] = useState();
   const [listHeader, setlistHeader] = useState();
   const [dialog, setdialog] = useState(false);
   const [VisibleMsg, setVisibleMsg] = useState(true);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
   const { CustName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
@@ -48,15 +52,62 @@ const ItemList = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items);
 
-    // if (UpdateBillData.Success == true) {
-    // }
-    // else {
-    //   alert('Response is Failed');
-    // }
+    if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
+      setlist(UpdateBillData.Message.items.map((itm) => {
+
+
+        return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
+      }));
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+
+    }
+
   }
+
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.checker,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
 
 
   // Resend Data to previous status 
@@ -65,6 +116,7 @@ const ItemList = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
+      lockedby: 0,
       messages: [
         {
           msgtouserrecno: 161,
@@ -97,6 +149,7 @@ const ItemList = ({ route, navigation }) => {
 
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       messages: [],
       status: CounterBillStatus.packer,
       checkerdate: AppFunction.getToday().dataDate,
@@ -110,8 +163,6 @@ const ItemList = ({ route, navigation }) => {
 
     if (UpdateBillData.Success == true) {
       addSaleBillAll();
-      // ApiCall();
-      // navigation.navigate('Checker');
     }
 
   }
@@ -140,9 +191,6 @@ const ItemList = ({ route, navigation }) => {
     }
 
   }
-
-
-
 
 
   // Function to check all checkbox is true  
@@ -294,6 +342,7 @@ const ItemList = ({ route, navigation }) => {
                     color={'dodgerblue'}
                     // key={item.key}
                     status={list[index].checked ? 'checked' : 'unchecked'}
+                    disabled={isReadOnly ? true : false}
                     onPress={(n) => {
                       // console.log('n==>', n)
                       setlist((p) => {
@@ -394,6 +443,7 @@ const ItemList = ({ route, navigation }) => {
                   color={'dodgerblue'}
                   // key={item.key}
                   status={item.attributescheckedbychecker ? 'checked' : 'unchecked'}
+                  disabled={isReadOnly ? true : false}
                   onPress={(n) => {
                     // console.log('n==>', n)
                     setlist((p) => {
@@ -492,7 +542,7 @@ const ItemList = ({ route, navigation }) => {
             <TouchableOpacity style={{ width: '50%' }}>
               <Button
                 style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
-                // onPress={ResendBill}
+                disabled={isReadOnly ? true : false}
                 onPress={() => setdialog(true)}
               >
                 <Text style={{ color: 'orange' }}>Resend</Text>
@@ -502,6 +552,7 @@ const ItemList = ({ route, navigation }) => {
             <TouchableOpacity style={{ width: '50%' }} >
               <Button
                 style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', }}
+                disabled={isReadOnly ? true : false}
                 onPress={SubmitCondition}
               >
                 <Text style={{ color: 'white' }}>Submit</Text>
@@ -529,9 +580,6 @@ const ItemList = ({ route, navigation }) => {
 
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <Button onPress={() => {
-                      // list.map((itm) => {
-                      //   console.log('itm=======', itm);
-                      // })
                       resendCounterBill();
                     }} >Resend</Button>
 

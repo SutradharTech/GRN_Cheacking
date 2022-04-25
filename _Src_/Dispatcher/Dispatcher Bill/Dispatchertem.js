@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-picker';
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -10,8 +10,9 @@ import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CounterBillStatus from '../../CounterBillStatus';
+import { Authcontext } from '../../auth/Auth';
 
-// console.log("item", route.params.item)
+
 const DispatcherItem = ({ route, navigation }) => {
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const DispatcherItem = ({ route, navigation }) => {
     getcounterbillimages();
   }, [])
 
+  const auth = useContext(Authcontext)
 
   const { custName, From, billno: billno, domainrecno: domainrecno, domainuserrecno: domainuserrecno, ApiCall } = route.params;
 
@@ -27,6 +29,7 @@ const DispatcherItem = ({ route, navigation }) => {
   const [dialog, setdialog] = useState(false);
   const [arrImages, setarrImages] = useState([]);
   const [VisibleMsg, setVisibleMsg] = useState(true);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
   const showDialog = () => setdialog(true);
 
@@ -47,12 +50,59 @@ const DispatcherItem = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
     if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
       setlist(UpdateBillData.Message.items);
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+
+      }
+
     }
 
   }
+
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.disptcher,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
+
 
   // Get Image (According to Billno) 
   async function getcounterbillimages() {
@@ -83,6 +133,7 @@ const DispatcherItem = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
+      lockedby: 0,
       status: CounterBillStatus.returntopacker
 
     }
@@ -108,7 +159,8 @@ const DispatcherItem = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
-      status: "T",
+      lockedby: 0,
+      status: CounterBillStatus.transporter,
       dispatchdate: AppFunction.getToday().dataDate,
       dispatchtime: AppFunction.getTime().dataTime
 
@@ -282,6 +334,7 @@ const DispatcherItem = ({ route, navigation }) => {
               <TouchableOpacity style={{ width: '50%' }}>
                 <Button
                   style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
+                  disabled={isReadOnly ? true : false}
                   onPress={() => setdialog(true)}
                 >
                   <Text style={{ color: 'orange' }}>Resend</Text>
@@ -292,6 +345,7 @@ const DispatcherItem = ({ route, navigation }) => {
               <TouchableOpacity style={{ width: '50%' }}>
                 <Button
                   style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', elevation: 5 }}
+                  disabled={isReadOnly ? true : false}
                   onPress={() => {
 
                     addcounterbill();
@@ -327,9 +381,6 @@ const DispatcherItem = ({ route, navigation }) => {
 
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <Button onPress={() => {
-                  // list.map((itm) => {
-                  //   console.log('itm=======', itm);
-                  // })
                   resendCounterBill();
                 }} >Resend</Button>
 

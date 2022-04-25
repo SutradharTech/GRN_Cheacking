@@ -5,14 +5,9 @@ import { Card } from 'react-native-shadow-cards';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios'
-// import { GRN } from '../auth/Auth';
 import AppConstants from '../AppConstant';
 import { Authcontext } from '../auth/Auth';
-// import { useAuth } from '../frameWork/Auth/Auth';
-// import AppFunctions from '../AppFunctions';
-// import AppConstants from '../AppConstants';
-// import { useTogglePasswordVisibility } from './entities/useTogglePasswordVisibility';
-// Code Start From Here --->
+
 
 
 const Login = ({ navigation }) => {
@@ -43,12 +38,6 @@ const Login = ({ navigation }) => {
 
     }
 
-
-    // Login Api Call -->
-    // async function submithandler() {
-    //     setisLogin(true);
-    //     console.log("_______________", isLogin)
-    // }
     return (
             <View style={styles.main}>
                 <Card style={styles.card}>
