@@ -1,27 +1,32 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Dialog, Portal, Provider, Modal } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Dialog, Portal, Provider, Modal, Banner } from 'react-native-paper';
 import axios from 'axios';
 import { Picker } from '@react-native-community/picker';
 import AppFunction from '../../AppFunction'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppConstants from '../../AppConstant';
 import { v4 as uuidv4 } from "uuid";
+import { Authcontext } from '../../auth/Auth';
+import CounterBillStatus from '../../CounterBillStatus';
 
 
-// console.log("item", route.params.item)
 const ShowItem = ({ route, navigation }) => {
+
+  const auth = useContext(Authcontext)
 
   const [list, setlist] = useState([]);
   const [Salebillfooter, setsalebillfooter] = useState();
   const [flag, setflag] = useState(false);
   const [listHeader, setlistHeader] = useState();
+  const [isReadOnly, setisReadOnly] = useState(false);
   const [dialog, setdialog] = useState(false);
   const [itemBatchList, setitemBatchList] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [VisibleMsg, setVisibleMsg] = useState(true);
   const [itemRecno, setitemRecno] = useState();
   const [filterBatch, setfilterBatch] = useState([]);
   const [itemQty, setitemQty] = useState();
@@ -34,7 +39,6 @@ const ShowItem = ({ route, navigation }) => {
     getcounterbill();
     getbatchno();
   }, [])
-
 
   console.log("list ---> ", list)
 
@@ -75,16 +79,67 @@ const ShowItem = ({ route, navigation }) => {
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
     setlistHeader(UpdateBillData.Message);
-    setlist(UpdateBillData.Message.items.map((itm) => {
 
 
-      return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
-    }));
+    if (UpdateBillData.Success) {
 
-    // if (UpdateBillData.Success == true) {
-    // }
+
+
+      setlist(UpdateBillData.Message.items.map((itm) => {
+
+
+        return { ...itm, totalqty: Number(itm.qty) + Number(itm.free) }
+      }));
+
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+      }
+
+
+    }
 
   }
+
+
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.maker,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
 
   console.log("Header---", listHeader)
 
@@ -112,6 +167,7 @@ const ShowItem = ({ route, navigation }) => {
 
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       messages: [
         {
           msgtouserrecno: 161,
@@ -143,6 +199,7 @@ const ShowItem = ({ route, navigation }) => {
     console.log("Api Call / addcounterbill /", "listHeader:", listHeader, "makerDate:", AppFunction.getToday().dataDate, "makerTime:", AppFunction.getTime().dataTime, "status:", 'C');
     let senddataapi = {
       ...listHeader,
+      lockedby: 0,
       items: list,
       messages: [],
       status: "Ch",
@@ -262,9 +319,7 @@ const ShowItem = ({ route, navigation }) => {
     }
     console.log("Check------>", result.length)
     if (result.length == 0) {
-      // list.map((itm) => {
-      //   console.log('itm=======', itm);
-      // })
+
       addcounterbill();
     }
     else {
@@ -315,6 +370,12 @@ const ShowItem = ({ route, navigation }) => {
           <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>{From}</Text>
         </View>
 
+        <View style={{ marginRight: '2%', flex: 0.15 }}>
+
+          <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
+
+        </View>
+
       </Card>
     );
   };
@@ -338,11 +399,7 @@ const ShowItem = ({ route, navigation }) => {
       setfilterBatch(res);
     }
 
-    // console.log("filter Batch----", filterBatch);
-
     let totalQty = Number(item?.qty) + Number(item?.free);
-
-    // console.log("Qty, free", item.qty, item.free)
 
 
     return (
@@ -370,6 +427,7 @@ const ShowItem = ({ route, navigation }) => {
                     color={'dodgerblue'}
                     // key={item.key}
                     status={list[index].picked ? 'checked' : 'unchecked'}
+                    disabled={isReadOnly ? true : false}
                     onPress={(n) => {
                       // console.log('n==>', n)
                       setlist((p) => {
@@ -422,24 +480,33 @@ const ShowItem = ({ route, navigation }) => {
                     <Text style={{ fontWeight: '400' }}>Quntity : </Text>
 
                     {/* <Text style={{ fontWeight: '800' }}>{item.qty}</Text> */}
+
                     <TextInput
                       value={totalQty == 0 ? "" : totalQty.toString()}
                       style={{ height: 30, width: 50 }}
+                      disabled={isReadOnly ? true : false}
                       onChangeText={(text) => {
 
-                        if (item.totalqty >= text) {
+                        try {
 
-                          setlist((p) => {
-                            
-                            p[index].qty = Number(text)-Number(item.free);
-                            return [...p]
-                          })
+                          if (item.totalqty >= text) {
+
+                            setlist((p) => {
+
+                              p[index].qty = Number(text) - Number(item.free);
+                              return [...p]
+                            })
+                          }
+                          else {
+
+                            alert("You Cannot add more qty !!")
+
+                          }
+
+                        } catch (error) {
+                          console.log(error);
                         }
-                        else {
 
-                          alert("You Cannot add more qty !!")
-
-                        }
                         console.log('p---------->', list)
                       }}
                       keyboardType='number-pad'
@@ -498,6 +565,7 @@ const ShowItem = ({ route, navigation }) => {
                   color={'orange'}
                   // key={item.key}
                   status={item.attributescheckedbymaker ? 'checked' : 'unchecked'}
+                  disabled={isReadOnly ? true : false}
                   onPress={(n) => {
                     // console.log('n==>', n)
                     setlist((p) => {
@@ -521,6 +589,7 @@ const ShowItem = ({ route, navigation }) => {
               <TouchableOpacity>
                 <Button
                   style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                  disabled={isReadOnly ? true : false}
                   onPress={() => { filterBatchfun(item.itemrecno, item.qty), showModal() }}
                 >
                   <Text style={{ color: 'orange' }}>Add Batch</Text>
@@ -563,6 +632,27 @@ const ShowItem = ({ route, navigation }) => {
 
         <View style={{ flex: 1 }}>
 
+          <Banner
+            visible={VisibleMsg}
+            actions={[
+              // {
+              //   label: 'Fix it',
+              //   onPress: () => setVisible(false),
+              // },
+              // {
+              //   label: 'Learn more',
+              //   onPress: () => setVisible(false),
+              // },
+            ]}
+          >
+            {
+              listHeader?.messages[0]?.status == 'M' ? (
+                listHeader?.messages[0]?.message
+
+              ) : null
+            }
+          </Banner>
+
           <FlatList
             // data={BillDetails}
             data={list}
@@ -582,6 +672,7 @@ const ShowItem = ({ route, navigation }) => {
             <TouchableOpacity>
               <Button
                 style={{ backgroundColor: 'white', alignSelf: 'center', borderWidth: 0.5, borderColor: 'orange', elevation: 6 }}
+                disabled={isReadOnly ? true : false}
                 onPress={() => setdialog(true)}
               >
                 <Text style={{ color: 'orange' }}>Revert</Text>
@@ -593,6 +684,7 @@ const ShowItem = ({ route, navigation }) => {
             <TouchableOpacity>
               <Button
                 style={{ backgroundColor: 'orange', alignSelf: 'center', elevation: 6 }}
+                disabled={isReadOnly ? true : false}
                 onPress={SubmitCondition}
               >
                 <Text style={{ color: 'white' }}>Submit</Text>

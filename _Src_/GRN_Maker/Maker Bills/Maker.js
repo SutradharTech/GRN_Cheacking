@@ -1,12 +1,17 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Button, Divider } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppConstants from '../../AppConstant';
+import CounterBillStatus from '../../CounterBillStatus';
+import { Authcontext } from '../../auth/Auth';
 
 const Maker = ({ navigation }) => {
+
+    const auth = useContext(Authcontext)
 
     useEffect(() => {
         ApiCall()
@@ -14,6 +19,7 @@ const Maker = ({ navigation }) => {
 
     const [filterBillDetails, setfilterBillDetails] = useState([])
     const [refreshing, setRefreshing] = React.useState(false);
+
 
     // Api Call
 
@@ -34,6 +40,7 @@ const Maker = ({ navigation }) => {
 
         setRefreshing(false);
     }
+
 
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
@@ -59,17 +66,20 @@ const Maker = ({ navigation }) => {
 
 
     function renderItems({ item, index }) {
-        console.log("item----------------", item)
+        // console.log("item----------------", item)
         return (
             <>
                 <View style={{ flex: 1, margin: "1%", marginVertical: '3%' }}>
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ShowItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ShowItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })}
+                            style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 20, }}>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
-                                <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                                <View style={{ flex: 2.5 }}>
+                                    <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>
+                                </View>
                             </View>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>

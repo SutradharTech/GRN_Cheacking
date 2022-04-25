@@ -9,8 +9,8 @@ const ChckerRevertedStack = () => {
   return (
     <Stack.Navigator>
 
-        <Stack.Screen name="MakerResendBill" component={MakerResendBill} options={{ headerShown: false, }} />
-        <Stack.Screen name="ResendItems" component={ResendItems} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#ffae42' }, headerTintColor: 'white', }} />
+        <Stack.Screen name="MakerResendBill" component={MakerResendBill} options={{ headerShown: true, title: 'Checker Reverted' }} />
+        <Stack.Screen name="ResendItems" component={ResendItems} options={{ headerShown: false, animation: 'slide_from_right', title: 'Item List', headerStyle: { backgroundColor: '#fff' }, headerTintColor: 'black', }} />
 
       </Stack.Navigator>
   )

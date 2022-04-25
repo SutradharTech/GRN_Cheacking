@@ -35,6 +35,7 @@ const PackerList = ({ navigation }) => {
 
     }
 
+
     // Formating Function For Date by DDMMYYYY
     const showDate_ddmmyy = (ab) => {
         let x = ab;
@@ -68,7 +69,8 @@ const PackerList = ({ navigation }) => {
 
                     <Card style={styles.card}>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('ListItem', { custName: item.custdescn, From: item.userroledescn,billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })} style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange',  borderRadius: 10,}}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ListItem', { custName: item.custdescn, From: item.userroledescn, billno: item.billno, domainrecno: item.domainrecno, domainuserrecno: item.domainuserrecno, ApiCall: ApiCall })}
+                            style={{ flex: 1, borderTopWidth: 10, borderColor: 'orange', borderRadius: 10, }}>
 
                             <View style={{ flex: 3, flexDirection: 'row', marginHorizontal: '3%', alignItems: 'center', padding: '1%', flexWrap: 'wrap' }}>
                                 <Text style={{ ...styles.content_text, fontWeight: '500' }}>{item.custdescn}</Text>

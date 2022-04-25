@@ -4,11 +4,12 @@ import ImagePicker, { openCamera, openPicker } from 'react-native-image-crop-pic
 import { Card } from 'react-native-shadow-cards';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TestScheduler } from 'jest';
-import { Checkbox, Button, Divider, TextInput, Provider, Portal, Dialog, Title } from 'react-native-paper';
+import { Checkbox, Button, Divider, TextInput, Provider, Portal, Dialog, Title, Banner } from 'react-native-paper';
 import axios from 'axios';
 import AppFunction from '../../AppFunction';
 import AppConstants from '../../AppConstant';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CounterBillStatus from '../../CounterBillStatus';
 
 // console.log("item", route.params.item)
 const RevertedItems = ({ route, navigation }) => {
@@ -25,13 +26,9 @@ const RevertedItems = ({ route, navigation }) => {
   const [checked, setChecked] = React.useState(false);
   const [isimage, setisimage] = useState();
   const [listHeader, setlistHeader] = useState();
-  const [dialog, setdialog] = useState(false);
   const [arrImages, setarrImages] = useState([]);
-
-  const showDialog = () => setdialog(true);
-
-  const hideDialog = () => setdialog(false);
-
+  const [VisibleMsg, setVisibleMsg] = useState(true);
+  const [isReadOnly, setisReadOnly] = useState(false);
 
   // Api Call for items according to bill
   async function getcounterbill() {
@@ -47,12 +44,58 @@ const RevertedItems = ({ route, navigation }) => {
     const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'getcounterbill/', sendapidata);
     console.log("ApiRes // getcounterbill", UpdateBillData.Message)
 
-    setlistHeader(UpdateBillData.Message);
     if (UpdateBillData.Success == true) {
+
+      setlistHeader(UpdateBillData.Message);
       setlist(UpdateBillData.Message.items);
+
+      if (UpdateBillData.Message.lockedby == 0) {
+
+        let senddata = UpdateBillData.Message;
+        addcounterbillforlock(senddata);
+      }
+      else {
+        if (UpdateBillData.Message.lockedby == auth?.state?.userdata?.recno) {
+
+          setisReadOnly(false);
+        }
+        else {
+          setisReadOnly(true);
+        }
+
+      }
     }
 
   }
+
+
+  // API Call for lock bill
+  async function addcounterbillforlock(senddata) {
+
+    console.log("Api Call /addcounterbill/", "senddata", senddata, "lockedby:", auth?.state?.userdata?.recno, "status: ", CounterBillStatus.maker)
+
+    let senddataapi = {
+
+      ...senddata,
+      lockedby: auth?.state?.userdata?.recno,
+      status: CounterBillStatus.revertedpackertoDispatcher,
+    }
+
+    console.log('senddataapi----', senddataapi);
+
+    const res = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
+    console.log("ApiRes /addcounterbillforlock/ addcounterbill / ", res.data)
+
+    if (res.data.Success == true) {
+      console.log("Bill locked Successfully");
+    }
+    else {
+      console.log('Failed to lock bill')
+    }
+  }
+
+
+
 
   // Get Image (According to Billno) 
   async function getcounterbillimages() {
@@ -77,29 +120,6 @@ const RevertedItems = ({ route, navigation }) => {
 
   console.log("Arr Images----", arrImages)
 
-  // Resend Data to previous status 
-  async function resendCounterBill() {
-
-    let senddataapi = {
-
-      ...listHeader,
-      status: CounterBillStatus.returntopacker
-
-    }
-
-    console.log('Resenddataapi----', senddataapi);
-
-    const { data: UpdateBillData } = await axios.post(AppConstants.APIurl2 + 'addcounterbill/', senddataapi);
-    console.log("ApiRes // getcounterbill", UpdateBillData)
-
-    if (UpdateBillData.Success == true) {
-      ApiCall();
-      navigation.navigate('Dispatcher');
-    }
-
-  }
-
-
   // Post Api Call (Send to next page) 
   async function addcounterbill() {
 
@@ -108,7 +128,7 @@ const RevertedItems = ({ route, navigation }) => {
     let senddataapi = {
 
       ...listHeader,
-      status: "T",
+      status: CounterBillStatus.transporter,
       dispatchdate: AppFunction.getToday().dataDate,
       dispatchtime: AppFunction.getTime().dataTime
 
@@ -128,203 +148,174 @@ const RevertedItems = ({ route, navigation }) => {
     }
   }
 
-  console.log("list ---> ", list)
-
-  const takePhoto = () => {   // Taking Photo (function) 
-
-    ImagePicker.openCamera({
-      multiple: true,
-      width: 300,
-      height: 400,
-      cropping: true,
-    }).then(image => {
-      console.log('image=====', image.path);
-
-      setisimage(image.path);
-
-    });
-  };
 
   return (
     <Provider>
 
-      <View style={{ flex: 1, alignItems: 'center', padding: '3%', }}>
+      <Portal>
 
-        {/* Customer Name & Created by*/}
-        <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
+        <View style={{ flex: 1, alignItems: 'center', padding: '3%', }}>
 
-          <View style={{ flex: 0.9, flexDirection: 'row', alignItems: 'center' }}>
-            <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '25%' }}>{custName}</Text>
-          </View>
+          <Banner
+            visible={VisibleMsg}
+            actions={[
+              // {
+              //   label: 'Fix it',
+              //   onPress: () => setVisible(false),
+              // },
+              // {
+              //   label: 'Learn more',
+              //   onPress: () => setVisible(false),
+              // },
+            ]}
+          >
+            {
+              listHeader?.messages[0]?.status == 'RD' ? (
+                listHeader?.messages[0]?.message
 
-          <View style={{ flex: 0.4, alignItems: 'center' }}>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>Created By</Text>
-            <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '15%' }}>{From}</Text>
-          </View>
+              ) : null
+            }
+          </Banner>
 
 
-        </Card>
+          {/* Customer Name & Created by*/}
+          <Card style={{ width: '100%', backgroundColor: 'ghostwhite', marginBottom: '2%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
 
-        {/* Measure */}
-        <Card style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', marginBottom: '4%' }} >
-
-
-          {/* Box And Goni (input) */}
-          <View style={{ flex: 1, paddingLeft: '3%', flexDirection: 'column', justifyContent: 'space-around', }}>
-
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
-
-              <Title>Measure</Title>
-
+            <View style={{ flex: 0.9, flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialCommunityIcons name={'account-circle'} size={32} color={'orange'} />
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '25%' }}>{custName}</Text>
             </View>
 
-            {/* <Divider /> */}
-
-            <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%', }}>
-
-              {/* Box */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.boxes}</Text>
-              </View>
-
-              {/* Bag */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 0.6 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofbags}</Text>
-              </View>
-
-
+            <View style={{ flex: 0.4, alignItems: 'center' }}>
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 15, marginRight: '15%' }}>Created By</Text>
+              <Text style={{ ...styles.content_text, fontWeight: '600', color: 'grey', fontSize: 16, marginRight: '15%' }}>{From}</Text>
             </View>
 
-            <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
-
-
-              {/* Saline Case */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline Case :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofsaline}</Text>
-              </View>
-
-              {/* Jar Case */}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar Case :</Text>
-                <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofjar}</Text>
-
-              </View>
+            <View style={{ marginRight: '2%', flex: 0.15 }}>
+              <MaterialCommunityIcons name={'android-messages'} size={32} color={'orange'} onPress={() => setVisibleMsg(!VisibleMsg)} />
             </View>
 
-            <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
-              {/* Goni */}
-              {/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
+          </Card>
+
+          {/* Measure */}
+          <Card style={{ flex: 0.5, justifyContent: 'center', flexDirection: 'row', marginBottom: '4%' }} >
+
+
+            {/* Box And Goni (input) */}
+            <View style={{ flex: 1, paddingLeft: '3%', flexDirection: 'column', justifyContent: 'space-around', }}>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', marginHorizontal: '4%', flexWrap: 'wrap' }}>
+
+                <Title>Measure</Title>
+
+              </View>
+
+              {/* <Divider /> */}
+
+              <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%', }}>
+
+                {/* Box */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Box :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.boxes}</Text>
+                </View>
+
+                {/* Bag */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 0.6 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Bag :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofbags}</Text>
+                </View>
+
+
+              </View>
+
+              <View style={{ justifyContent: 'space-around', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
+
+
+                {/* Saline Case */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Saline Case :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofsaline}</Text>
+                </View>
+
+                {/* Jar Case */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>Jar Case :</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '500' }}>{listHeader?.noofjar}</Text>
+
+                </View>
+              </View>
+
+              <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginVertical: '5%', width: '100%' }}>
+                {/* Goni */}
+                {/* <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingRight: '4%', flex: 1 }}>
                 <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni :</Text>
                 <Text style={{ fontSize: 16, fontWeight: '500' }}>Goni</Text>
               </View> */}
 
-            </View>
-
-          </View>
-
-        </Card>
-
-        <Card style={{ flex: 1, padding: '2%', justifyContent: 'space-around', }}>
-
-          <Divider />
-
-          <ScrollView >
-
-            {
-              arrImages != null ? (
-                <View style={styles.image_view} >
-                  {
-
-                    arrImages.map((img) => {
-                      return (
-
-                        <View style={{ borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
-                          <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
-                          {/* <Image source={{ uri: img }} style={styles.image} /> */}
-                          <Text style={{ color: 'black', textAlign: 'center' }}>{img?.descn}</Text>
-                        </View>
-                      )
-
-                    })
-
-                  }
-                </View>
-              ) : (
-                <View style={styles.image_view}>
-                  <Text>Please Click the image</Text>
-                </View>
-              )
-            }
-          </ScrollView>
-
-          {/* Submit button and Resend Button */}
-
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-            {/* Resend */}
-            <TouchableOpacity style={{ width: '50%' }}>
-              <Button
-                style={{ backgroundColor: 'white', width: '80%', alignSelf: 'center', borderWidth: 0.3, borderColor: 'orange' }}
-                onPress={() => setdialog(true)}
-              >
-                <Text style={{ color: 'orange' }}>Resend</Text>
-              </Button>
-            </TouchableOpacity>
-
-            {/* Submit */}
-            <TouchableOpacity style={{ width: '50%' }}>
-              <Button
-                style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', elevation: 5 }}
-                onPress={() => {
-
-                  addcounterbill();
-                }}
-              >
-                <Text style={{ color: 'white' }}>Submit</Text>
-              </Button>
-            </TouchableOpacity>
-          </View>
-
-        </Card>
-
-      </View>
-
-      {
-        dialog ? (
-          <Portal>
-            <Dialog visible={showDialog} onDismiss={hideDialog}>
-
-              <Dialog.Title>Message</Dialog.Title>
-
-              <TextInput
-                style={{ fontWeight: '600', height: 40, width: '85%', alignSelf: 'center' }}
-                multiline={true}
-                onChangeText={(text) => {
-                  listHeader.message = text
-
-                  console.log('listHeader---------->', listHeader)
-                }}
-              />
-
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                <Button onPress={() => {
-                  // list.map((itm) => {
-                  //   console.log('itm=======', itm);
-                  // })
-                  resendCounterBill();
-                }} >Resend</Button>
-
-                <Button onPress={hideDialog}>Exit</Button>
               </View>
 
-            </Dialog>
-          </Portal>
-        ) : null
-      }
+            </View>
+
+          </Card>
+
+          <Card style={{ flex: 1, padding: '2%', justifyContent: 'space-around', }}>
+
+            <Divider />
+
+            <ScrollView >
+
+              {
+                arrImages != null ? (
+                  <View style={styles.image_view} >
+                    {
+
+                      arrImages.map((img) => {
+                        return (
+
+                          <View style={{ borderWidth: 0.5, borderColor: 'grey', marginBottom: '4%' }}>
+                            <Image source={{ uri: `data:image/png;base64,${img.image}` }} style={styles.image} />
+                            {/* <Image source={{ uri: img }} style={styles.image} /> */}
+                            <Text style={{ color: 'black', textAlign: 'center' }}>{img?.descn}</Text>
+                          </View>
+                        )
+
+                      })
+
+                    }
+                  </View>
+                ) : (
+                  <View style={styles.image_view}>
+                    <Text>Please Click the image</Text>
+                  </View>
+                )
+              }
+            </ScrollView>
+
+            {/* Submit button and Resend Button */}
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+
+              {/* Submit */}
+              <TouchableOpacity style={{ width: '50%' }}>
+                <Button
+                  style={{ backgroundColor: 'orange', width: '80%', alignSelf: 'center', elevation: 5 }}
+                  disabled={isReadOnly ? true : false}
+                  onPress={() => {
+
+                    addcounterbill();
+                  }}
+                >
+                  <Text style={{ color: 'white' }}>Submit</Text>
+                </Button>
+              </TouchableOpacity>
+            </View>
+
+          </Card>
+
+        </View>
+
+      </Portal>
 
     </Provider>
   )
